@@ -83,17 +83,17 @@ def getdoctor(columns=None):
 def getdoctorFactory(columns=None):
     return partial(getdoctor, columns=columns)    
     
-#class patientdocadmin(db.Model):
- #   __table__ = db.Model.metadata.tables['patientdocadmin']
+class assignment(db.Model):
+    __table__ = db.Model.metadata.tables['assignment']
     
-#def getpatientdocadmin(columns=None):
- #   u = patientdocadmin.query
-  #  if columns:
-   #     u = u.options(orm.load_only(*columns))
-    #return u
+def getassignment(columns=None):
+    u = assignment.query
+    if columns:
+        u = u.options(orm.load_only(*columns))
+    return u
 
-#def getpatientdocadminFactory(columns=None):
- #   return partial(getpatientdocadmin, columns=columns)    
+def getassignmentFactory(columns=None):
+    return partial(getassignment, columns=columns)    
     
     
 

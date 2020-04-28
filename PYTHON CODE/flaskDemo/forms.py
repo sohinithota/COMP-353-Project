@@ -5,7 +5,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextA
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError,Regexp
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from flaskDemo import db
-from flaskDemo.models import User, patient, getpatient, getpatientFactory, doctor, getdoctor, getdoctorFactory
+from flaskDemo.models import User, patient, getpatient, getpatientFactory, doctor, getdoctor, getdoctorFactory, assignment, getassignment, getassignmentFactory
 from wtforms.fields.html5 import DateField
 
 pid = patient.query.with_entities(patient.patientID)
@@ -103,6 +103,8 @@ class AssignUpdateForm(FlaskForm):
 #  One of many ways to use SelectField or QuerySelectField.  Lots of issues using those fields!!
     pid = SelectField('Patient ID:',choices=patientChoices, coerce = int)  # empChoices defined at top
     
+    medcondition = StringField('Patient\'s Medical Condition:')
+    
 # Doctor ID
     docid = SelectField("Doctor ID", choices=doctorChoices, coerce = int)    
      
@@ -132,7 +134,7 @@ class AssignUpdateForm(FlaskForm):
 
 class AssignForm(AssignUpdateForm):
 
-    pid = SelectField("Patient ID", choices=patientChoices)
+    pid = IntegerField("Patient ID", validators=[DataRequired()])
     submit = SubmitField('Add this Patient')
 
     def validate_pid(self, pid):    #because dnumber is primary key and should be unique

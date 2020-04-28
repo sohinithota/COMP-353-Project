@@ -5,6 +5,7 @@ from flask_login import LoginManager
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
+# Change cfn:naiman to your_username:your_password
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://cfn:naiman@localhost/healthcareprovider'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)

@@ -7,7 +7,7 @@
               <a class="mr-2" href="#">{{ row }}</a>		  
               <small class="text-muted">{{ row['patfname'] }}  {{ row['patlname'] }} {{ row['doclname'] }} </small>              		  
             </div>
-			<h2><a class="article-title" href="{{ url_for('assign',docid=row.docid, pid=row.pid) }}">{{ row.doclname}}</a></h2>		
+			<h2><a class="article-title" href="{{ url_for('assign',pid=row.pid, docid=row.docid, medcondition =row.medcondition) }}">{{ row.medcondition}}</a></h2>		
           
 		  </div>		  
         </article>

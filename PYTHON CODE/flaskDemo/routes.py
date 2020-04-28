@@ -4,7 +4,7 @@ from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskDemo import app, db, bcrypt
 from flaskDemo.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, AssignForm,AssignUpdateForm
-from flaskDemo.models import User, Post, medicaldevices, bed, patient, doctor
+from flaskDemo.models import User, Post, medicaldevices, bed, patient, doctor, assignment
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import datetime
 
@@ -18,13 +18,13 @@ def home():
     return render_template('assign_home.html', outString1 = results1)
     posts = Post.query.all()
     return render_template('home.html', posts=posts)
-    results3 = patientdocadmin.query.all()
-    results2 = patient.query.join(patientdocadmin,patient.patientID == patientdocadmin.patientID) \
-               .add_columns(patient.fname, patient.lname, patient.ssn, patientdocadmin.adminID) \
-               .join(doctor, doctor.docID == patientdocadmin.docID).add_columns(doctor.docfname,doctor.doclname )
-    results = patient.query.join(patientdocadmin,patient.patientID == patientdocadmin.patientID) \
-               .add_columns(patient.fname, patient.lname, patient.ssn, patientdocadmin.adminID)
-    return render_template('join.html', title='Join',joined_1_n=results, joined_m_n=results2)
+    results3 = assignment.query.all()
+    results2 = patient.query.join(assignment,patient.patientID == assignment.patientID) \
+               .add_columns(patient.fname, patient.lname, patient.ssn, assignment.adminID) \
+               .join(doctor, doctor.docID == assignment.docID).add_columns(doctor.docfname,doctor.doclname)
+    results = patient.query.join(assignment,patient.patientID == assignment.patientID) \
+               .add_columns(patient.fname, patient.lname, patient.ssn, assignment.adminID)
+    return render_template('home.html', title='Join',joined_1_n=results, joined_m_n=results2)
 
    
 
@@ -113,7 +113,7 @@ def new_assign():
     if form.validate_on_submit():
         assign = patient(patfname=form.patfname.data, patlname=form.patlname.data, pid=form.pid.data)
         assign1 = doctor(docid=form.docid.data)
-        assign2 = patientdocadmin(docid=form.docid.data, pid=form.pid.data)
+        assign2 = assignment(docid=form.docid.data, pid=form.pid.data)
         db.session.add(assign)
         db.session.add(assign1)
         db.session.add(assign2)
@@ -127,24 +127,36 @@ def new_assign():
 @app.route("/assign/<docid>/<pid>")
 @login_required
 def assign(docid, pid):
-   assign = patientdocadmin.query.get_or_404([docid,pid])
+   assign = patient.query.get_or_404([docid,pid])
    return render_template('assign.html', title=str(assign.pid) + "_" + str(assign1.docid), assign=assign, now=datetime.utcnow())
 
 
 @app.route("/assign/<docid>/<pid>update", methods=['GET', 'POST'])
 @login_required
 def update_assign(docid, pid):
+    assign = patient.query.get_or_404([docid, pid])
+    currentAssign = assign.medcondition
     form = AssignUpdateForm()
-    return render_template('home.html', title='Update Assignment',
-                           form=form, legend='Update Assignment')
+    if form.validate_on_submit():          # notice we are are not passing the dnumber from the form
+        if currentAssign !=form.medcondition.data:
+            assign.medcondition=form.medcondition.data
+        assign.pid=form.pid.data
+        db.session.commit()
+        flash('Your assignment has been updated!', 'success')
+        return redirect(url_for('assign', pid=pid))
+    elif request.method == 'GET':              # notice we are not passing the dnumber to the form
 
+        form.pid.data = assign.pid
+        form.medcondition.data = assign.medcondition
+    return render_template('create_assign.html', title='Update Assignment',
+                           form=form, legend='Update Assignment')
 
 
 
 @app.route("/assign/<docid>/<pid>delete", methods=['POST'])
 @login_required
 def delete_assign(docid, pid):
-    assign = patientdocadmin.query.get_or_404([docid, pid])
+    assign = patient.query.get_or_404([docid, pid])
     db.session.delete(assign)
     db.session.commit()
     flash('The apatient assignment has been deleted!', 'success')

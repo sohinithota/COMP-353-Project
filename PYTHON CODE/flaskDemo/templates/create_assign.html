@@ -7,33 +7,6 @@
             <legend class="border-bottom mb-4">{{ legend }}</legend>
 			{% if legend != "Update Assignment" %}			
 			<div class="form-group">
-                {{ form.patfname.label(class="form-control-label") }}
-                {% if form.patfname.errors %}
-                    {{ form.patfname(class="form-control form-control-lg is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.patfname.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.patfname(class="form-control form-control-lg") }}
-                {% endif %}
-            </div>
-			{% endif %}
-			<div class="form-group">
-                {{ form.patlname.label(class="form-control-label") }}
-                {% if form.patlname.errors %}
-                    {{ form.patlname(class="form-control form-control-lg is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.patlname.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.patlname(class="form-control form-control-lg") }}
-                {% endif %}
-            </div>
-			<div class="form-group">
                 {{ form.pid.label(class="form-control-label") }}
                 {% if form.pid.errors %}
                     {{ form.pid(class="form-control form-control-lg is-invalid") }}
@@ -46,17 +19,18 @@
                     {{ form.pid(class="form-control form-control-lg") }}
                 {% endif %}
             </div>
+			{% endif %}
 			<div class="form-group">
-                {{ form.docid.label(class="form-control-label") }}
-                {% if form.docid.errors %}
-                    {{ form.docid(class="form-control form-control-lg is-invalid") }}
+                {{ form.medcondition.label(class="form-control-label") }}
+                {% if form.medcondition.errors %}
+                    {{ form.medcondition(class="form-control form-control-lg is-invalid") }}
                     <div class="invalid-feedback">
-                        {% for error in form.docid.errors %}
+                        {% for error in form.medcondition.errors %}
                             <span>{{ error }}</span>
                         {% endfor %}
                     </div>
                 {% else %}
-                    {{ form.docid(class="form-control form-control-lg") }}
+                    {{ form.medcondition(class="form-control form-control-lg") }}
                 {% endif %}
             </div>
         </fieldset>
