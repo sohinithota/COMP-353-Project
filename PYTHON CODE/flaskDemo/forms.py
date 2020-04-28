@@ -29,8 +29,6 @@ for row in docid:
     result2.append(rowDict)
 doctorChoices = [(row['docID'],row['docID']) for row in result2]  # change
 
-
-
 class RegistrationForm(FlaskForm):
     username = StringField('Username',
                            validators=[DataRequired(), Length(min=2, max=20)])
@@ -51,14 +49,12 @@ class RegistrationForm(FlaskForm):
         if user:
             raise ValidationError('That email is taken. Please choose a different one.')
 
-
 class LoginForm(FlaskForm):
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
-
 
 class UpdateAccountForm(FlaskForm):
     username = StringField('Username',
@@ -117,20 +113,15 @@ class AssignUpdateForm(FlaskForm):
     #hours = DateField('Hours', validators=[DataRequired(),Length(max=30)]) #hours field in works_on  # This is using the html5 date picker (imported)
     submit = SubmitField('Update this Assignment')
 
-
-
 # got rid of def validate_dnumber
-
     
     def validate_doc(self, doclname):    # apparently in the company DB, dname is specified as unique
          assign1 = doctor.query.filter_by(doclname=doclname.data).first()
          if assign1 and (str(doctor.docID) != str(self.docID.data)):
              raise ValidationError('That doctor is already attending someone. Please choose a different doctor.')
-         
-         
+                  
          #if assign:
              #raise ValidationError('That doctor is already attending someone. Please choose a different doctor.')
-
 
 class AssignForm(AssignUpdateForm):
 

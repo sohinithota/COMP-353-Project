@@ -1,3 +1,5 @@
+# Creates classes that access the DB
+
 from datetime import datetime
 from flaskDemo import db, login_manager
 from flask_login import UserMixin
@@ -23,7 +25,6 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
 
-
 class Post(db.Model):
      __table_args__ = {'extend_existing': True}
      id = db.Column(db.Integer, primary_key=True)
@@ -34,11 +35,6 @@ class Post(db.Model):
 
      def __repr__(self):
          return f"Post('{self.title}', '{self.date_posted}')"
-
-
-
-
-
 
 class bed(db.Model):
     __table__ = db.Model.metadata.tables['bed']
@@ -55,45 +51,43 @@ class medicaldevices(db.Model):
 
 #def getDepartmentFactory(columns=None):
 #    return partial(getDepartment, columns=columns)
-
     
 class patient(db.Model):
     __table__ = db.Model.metadata.tables['patient']
     
-def getpatient(columns=None):
-    u = patient.query
-    if columns:
-        u = u.options(orm.load_only(*columns))
-    return u
-    
-def getpatientFactory(columns=None):
-    return partial(getpatient, columns=columns)
-    
-    
+	def getpatient(columns=None):
+		u = patient.query
+		if columns:
+			u = u.options(orm.load_only(*columns))
+		return u
+		
+	def getpatientFactory(columns=None):
+		return partial(getpatient, columns=columns)
+        
 class doctor(db.Model):
     __table__ = db.Model.metadata.tables['doctor']
     
     
-def getdoctor(columns=None):
-    u = doctor.query
-    if columns:
-        u = u.options(orm.load_only(*columns))
-    return u
-    
-def getdoctorFactory(columns=None):
-    return partial(getdoctor, columns=columns)    
+	def getdoctor(columns=None):
+		u = doctor.query
+		if columns:
+			u = u.options(orm.load_only(*columns))
+		return u
+		
+	def getdoctorFactory(columns=None):
+		return partial(getdoctor, columns=columns)    
     
 class assignment(db.Model):
     __table__ = db.Model.metadata.tables['assignment']
     
-def getassignment(columns=None):
-    u = assignment.query
-    if columns:
-        u = u.options(orm.load_only(*columns))
-    return u
+	def getassignment(columns=None):
+		u = assignment.query
+		if columns:
+			u = u.options(orm.load_only(*columns))
+		return u
 
-def getassignmentFactory(columns=None):
-    return partial(getassignment, columns=columns)    
+	def getassignmentFactory(columns=None):
+		return partial(getassignment, columns=columns)    
     
     
 
