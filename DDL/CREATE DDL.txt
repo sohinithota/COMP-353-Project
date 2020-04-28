@@ -63,3 +63,5 @@ create table patientAdministrator (
     primary key (adminID)
 ) ;
 
+ALTER TABLE user CHANGE COLUMN username accountname varchar(60);
+ALTER TABLE user DROP COLUMN email;

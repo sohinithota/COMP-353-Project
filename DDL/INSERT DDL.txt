@@ -43,10 +43,3 @@ values
 (333, 106, 401),
 (444, 107, 501),
 (444, 108, 501);
-
-INSERT INTO user
-(username, image_file, password)
-values
-(0, administrator, default.jpg, admin),
-(1, doctor1, default.jpg, doctor1),
-(2, doctor2, default.jpg, doctor2);
