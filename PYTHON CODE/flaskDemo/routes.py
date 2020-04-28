@@ -20,12 +20,15 @@ def login():
 		return redirect(url_for('home'))
 	form = LoginForm()
 	if form.validate_on_submit():
-		user = User.query.filter_by(accountname=form.accountname.data).first()
-		if user and bcrypt.check_password_hash(user.password, form.password.data):
-			login_user(user)
-			next_page = request.args.get('next')
-			return redirect(next_page) if next_page else redirect(url_for('home'))
-		else:
+		try:
+			user = User.query.filter_by(accountname=form.accountname.data).first()
+			if user and bcrypt.check_password_hash(user.password, form.password.data):
+				login_user(user)
+				next_page = request.args.get('next')
+				return redirect(next_page) if next_page else redirect(url_for('home'))
+			else:
+				flash('Login Unsuccessful. Please check account name and password', 'danger')
+		except ValueError:
 			flash('Login Unsuccessful. Please check account name and password', 'danger')
 	return render_template('login.html', title='Login', form=form)
 
@@ -44,7 +47,7 @@ def home():
 			   .join(doctor, doctor.docID == assignment.docID).add_columns(doctor.docfname,doctor.doclname)
 	results = patient.query.join(assignment,patient.patientID == assignment.patientID) \
 			   .add_columns(patient.fname, patient.lname, patient.ssn, assignment.adminID)
-	return render_template('home.html', title='Join',joined_1_n=results, joined_m_n=results2)
+	return render_template('home.html', title='Join', joined_1_n = results, joined_m_n = results2, currentUser = current_user)
 
 @app.route("/about")
 def about():
@@ -95,17 +98,16 @@ def account():
 		if form.picture.data:
 			picture_file = save_picture(form.picture.data)
 			current_user.image_file = picture_file
-		current_user.username = form.username.data
-		current_user.email = form.email.data
+		hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+		current_user.accountname = form.accountname.data
+		current_user.password = hashed_password
 		db.session.commit()
 		flash('Your account has been updated!', 'success')
 		return redirect(url_for('account'))
 	elif request.method == 'GET':
-		form.username.data = current_user.username
-		form.email.data = current_user.email
+		form.accountname.data = current_user.accountname
 	image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
-	return render_template('account.html', title='Account',
-						   image_file=image_file, form=form)
+	return render_template('account.html', title='Account', image_file=image_file, form=form)
 
 
 @app.route("/assign/new", methods=['GET', 'POST'])
