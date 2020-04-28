@@ -7,12 +7,14 @@ from flaskDemo.forms import RegistrationForm, LoginForm, UpdateAccountForm, Post
 from flaskDemo.models import User, Post, medicaldevices, bed, patient, doctor, assignment
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import datetime
+from sqlalchemy.exc import IntegrityError
 
 
 @app.route("/")
 @app.route("/login", methods=['GET', 'POST'])
 def login():
 	if current_user.is_authenticated:
+		print(current_user)
 		return redirect(url_for('home'))
 	form = LoginForm()
 	if form.validate_on_submit():
@@ -26,6 +28,7 @@ def login():
 	return render_template('login.html', title='Login', form=form)
 
 @app.route("/home")
+@login_required
 def home():
 	results = patient.query.all()
 	return render_template('assign_home.html', outString = results)
@@ -41,13 +44,9 @@ def home():
 			   .add_columns(patient.fname, patient.lname, patient.ssn, assignment.adminID)
 	return render_template('home.html', title='Join',joined_1_n=results, joined_m_n=results2)
 
-   
-
-
 @app.route("/about")
 def about():
 	return render_template('about.html', title='About')
-
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -55,19 +54,22 @@ def register():
 		return redirect(url_for('home'))
 	form = RegistrationForm()
 	if form.validate_on_submit():
-		hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-		user = User(accountname=form.accountname.data, password=hashed_password)
-		db.session.add(user)
-		db.session.commit()
-		flash('Your account has been created! You are now able to log in', 'success')
-		return redirect(url_for('login'))
+		try:
+			hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+			user = User(accountname=form.accountname.data, password=hashed_password)
+			db.session.add(user)
+			db.session.commit()
+			flash('Your account has been created! You are now able to log in', 'success')
+			return redirect(url_for('login'))
+		except IntegrityError:
+			flash('Invalid account information. Try again.')
+			return redirect(url_for('register'))
 	return render_template('register.html', title='Register', form=form)
 
 @app.route("/logout")
 def logout():
 	logout_user()
-	return redirect(url_for('home'))
-
+	return redirect(url_for('login'))
 
 def save_picture(form_picture):
 	random_hex = secrets.token_hex(8)
@@ -121,13 +123,11 @@ def new_assign():
 	return render_template('create_assign.html', title='New Assignment',
 						   form=form, legend='New Assignment')
 
-
 @app.route("/assign/<docid>/<pid>")
 @login_required
 def assign(docid, pid):
    assign = patient.query.get_or_404([docid,pid])
    return render_template('assign.html', title=str(assign.pid) + "_" + str(assign1.docid), assign=assign, now=datetime.utcnow())
-
 
 @app.route("/assign/<docid>/<pid>update", methods=['GET', 'POST'])
 @login_required
@@ -148,8 +148,6 @@ def update_assign(docid, pid):
 		form.medcondition.data = assign.medcondition
 	return render_template('create_assign.html', title='Update Assignment',
 						   form=form, legend='Update Assignment')
-
-
 
 @app.route("/assign/<docid>/<pid>delete", methods=['POST'])
 @login_required

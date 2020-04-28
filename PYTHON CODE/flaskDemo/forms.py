@@ -30,17 +30,15 @@ for row in docid:
 doctorChoices = [(row['docID'],row['docID']) for row in result2]  # change
 
 class RegistrationForm(FlaskForm):
-    accountname = StringField('Account Name',
-                           validators=[DataRequired(), Length(min=2, max=20)])
+    accountname = StringField('Account Name', validators=[DataRequired(), Length(min=2, max=20)])
     password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Sign Up')
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Create Account')
 
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
+    def validate_username(self, accountname):
+        user = User.query.filter_by(accountname=accountname.data).first()
         if user:
-            raise ValidationError('That username is taken. Please choose a different one.')
+            raise ValidationError('That account name is taken. Please choose a different one.')
 			
 class LoginForm(FlaskForm):
     accountname = StringField('Account Name', validators=[DataRequired()])
