@@ -1,0 +1,45 @@
+INSERT INTO patient
+(patientID,patfname,patminit,patlname,ssn,bdate,address,sex,arrivalTime,departTime,medcondition,adminID,inBed,bedID)
+values
+(101,'James', 'E', 'Borg', '888665555', '1937-11-10', '450 Stone, Houston TX', 'M','2020-03-19 06:10:00','2020-03-19 06:10:00','Flu',111, 'N', NULL),
+(102,'John', 'B', 'Smith', '123456789', '1965-01-09', '731 Fondren, Houston TX', 'M','2020-03-22 07:20:00',NULL, 'Covid-19',111, 'Y', 5),
+(103,'Franklin', 'T', 'Wong', '333445555', '1955-12-08', '638 Voss, Houston TX', 'M','2020-03-23 08:10:55','NULL', 'Covid-19',222, 'Y',4),
+(104,'Alicia', 'J', 'Zelaya', '999887777', '1968-01-19', '3321 Castle, Spring TX', 'F','2020-03-24 06:30:00','2020-03-19 06:10:00', 'Fever',333, 'N', NULL),
+(105,'Jennifer', 'S', 'Wallace', '987654321', '1941-06-20', '291 Berry, Bellaire TX', 'F','2020-03-25 07:40:00','2020-03-19 06:10:00', 'Collitis',222,'N', NULL),
+(106,'Ramesh', 'K', 'Narayan', '666884444', '1962-09-15', '975 Fire Oak, Humble TX', 'M','2020-03-27 08:15:20','NULL', 'Covid-19',333, 'Y', 6),
+(107,'Joyce', 'A', 'English', '453453453', '1972-07-31', '5631 Rice, Houston TX', 'F','2020-03-28 09:50:30','2020-03-19 06:10:00', 'Pneumonia',444, 'N', NULL),
+(108,'Ahmad', 'V', 'Jabbar', '987987987', '1969-03-29', '980 Dallas, Houston TX', 'M','2020-03-30 22:15:00','2020-03-19 06:10:00', 'Flu',444, 'N', NULL),
+(109,'Jenny', 'K', 'minto', '867556436', '19-03-2002', '123 paola dr, Tampa FL', 'F','2020-04-11 20:10:00','2020-04-17 05:00:00', 'Flu',444, 'N', NULL);
+
+INSERT INTO doctor 
+(docID,adminID,speciality,docfname,doclname,employmentDate,deviceID)
+values
+(201, 111, 'Internal Medicine', 'Smith', 'Allen', '2002-10-10', 999),
+(301, 222, 'Internal Medicine', 'Patricia', 'Rosas', '2010-09-15', 888),
+(401, 333, 'Family Medicine', 'David', 'Mann', '2008-01-10', 999),
+(501, 444, 'Family Medicine', 'Johnson', 'Davis' ,'2009-07-19', 888);
+
+INSERT INTO bed
+(bedID,occupied,clean)
+values
+(4, 'Y', 'Y'),
+(5, 'Y', 'Y'),
+(6, 'Y', 'Y');
+
+INSERT INTO medicaldevices
+(deviceID,devicename)
+values
+(999, 'Stethoscope'),
+(888, 'Thermometer');
+
+INSERT INTO assignment
+(adminID,patientID,docID)
+values
+(111, 101, 201),
+(111, 102, 201),
+(222, 103, 301),
+(222, 105, 301),
+(333, 104, 401),
+(333, 106, 401),
+(444, 107, 501),
+(444, 108, 501);
