@@ -10,8 +10,6 @@ from datetime import datetime
 
 
 @app.route("/")
-@app.route("/login")
-
 @app.route("/login", methods=['GET', 'POST'])
 def login():
 	if current_user.is_authenticated:
@@ -20,7 +18,7 @@ def login():
 	if form.validate_on_submit():
 		user = User.query.filter_by(accountname=form.accountname.data).first()
 		if user and bcrypt.check_password_hash(user.password, form.password.data):
-			login_user(user, remember=form.remember.data)
+			login_user(user)
 			next_page = request.args.get('next')
 			return redirect(next_page) if next_page else redirect(url_for('home'))
 		else:
