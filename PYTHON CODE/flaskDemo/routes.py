@@ -15,6 +15,8 @@ from sqlalchemy.exc import IntegrityError
 def login():
 	if current_user.is_authenticated:
 		print(current_user)
+		print(type(current_user))
+		print(current_user.accountname)
 		return redirect(url_for('home'))
 	form = LoginForm()
 	if form.validate_on_submit():
