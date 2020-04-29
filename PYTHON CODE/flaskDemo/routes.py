@@ -42,11 +42,8 @@ def home():
 	posts = Post.query.all()
 	return render_template('home.html', posts=posts)
 	results3 = assignment.query.all()
-	results2 = patient.query.join(assignment,patient.patientID == assignment.patientID) \
-			   .add_columns(patient.fname, patient.lname, patient.ssn, assignment.adminID) \
-			   .join(doctor, doctor.docID == assignment.docID).add_columns(doctor.docfname,doctor.doclname)
-	results = patient.query.join(assignment,patient.patientID == assignment.patientID) \
-			   .add_columns(patient.fname, patient.lname, patient.ssn, assignment.adminID)
+	results2 = patient.query.join(assignment,patient.patientID == assignment.patientID).add_columns(patient.fname, patient.lname, patient.ssn, assignment.adminID).join(doctor, doctor.docID == assignment.docID).add_columns(doctor.docfname,doctor.doclname)
+	results = patient.query.join(assignment,patient.patientID == assignment.patientID).add_columns(patient.fname, patient.lname, patient.ssn, assignment.adminID)
 	return render_template('home.html', title='Join', joined_1_n = results, joined_m_n = results2, currentUser = current_user)
 
 @app.route("/about")
@@ -55,8 +52,8 @@ def about():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
-	if current_user.is_authenticated:
-		return redirect(url_for('home'))
+	# if current_user.is_authenticated:
+		# return redirect(url_for('home'))
 	form = RegistrationForm()
 	if form.validate_on_submit():
 		try:
