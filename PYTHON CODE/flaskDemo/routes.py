@@ -52,8 +52,6 @@ def about():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
-	# if current_user.is_authenticated:
-		# return redirect(url_for('home'))
 	form = RegistrationForm()
 	if form.validate_on_submit():
 		try:

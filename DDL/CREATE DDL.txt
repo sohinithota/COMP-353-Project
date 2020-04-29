@@ -63,3 +63,4 @@ create table patientAdministrator (
 
 ALTER TABLE user CHANGE COLUMN username accountname varchar(60);
 ALTER TABLE user DROP COLUMN email;
+Alter TABLE user ADD COLUMN IF NOT EXISTS accounttype int;
