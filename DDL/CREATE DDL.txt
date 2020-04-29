@@ -39,7 +39,7 @@ CREATE TABLE patient(
     address VARCHAR(60),
     sex VARCHAR(60),
     arrivalTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    departTime TIMESTAMP,
+    departTime TIMESTAMP NULL,
     medicalCondition VARCHAR(60) NOT NULL,
     inBed BOOLEAN NOT NULL DEFAULT FALSE,
     bedID INT,

@@ -33,10 +33,24 @@ def login():
 @app.route("/home")
 @login_required
 def home():
-	results = Patient.query.all()
-	return render_template('assign_home.html', outString = results)
-	results1 = doctor.query.all()
-	return render_template('assign_home.html', outString1 = results1)
+	if current_user.accountType == 1:
+		currentPatientAdmin = db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == current_user.id).first()
+		assignedPatients = db.session.query(Patient).filter(Patient.patientadministratorID == currentPatientAdmin.id).all()
+		data = []
+		for x in assignedPatients:
+			if (x.departTime is None):
+				if (x.minit is None) or (x.minit == ""):
+					name = x.fname + " " + x.lname
+				else:
+					name = x.fname + " " + x.minit + " " + x.lname
+				data.append({"name":name, "id":x.id, "ssn":x.ssn, "arrivalTime":x.arrivalTime, "medicalCondition":x.medicalCondition, "inBed":x.inBed, "bedID":x.bedID, "doctorID":x.doctorID})
+			else:
+				pass
+		return render_template('assign_home.html', patientInformation = data)
+	# results = Patient.query.all()
+	# return render_template('assign_home.html', outString = results)
+	# results1 = doctor.query.all()
+	# return render_template('assign_home.html', outString1 = results1)
 	posts = Post.query.all()
 	return render_template('home.html', posts=posts)
 	results3 = assignment.query.all()
@@ -107,7 +121,7 @@ def account():
 			test.update({Doctor.accountID:accountID})
 		else:
 			test = db.session.query(PatientAdministrator).filter(PatientAdministrator.id == form.associatewithemployee.data)
-			test2 = db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == accountID)
+			test2 = db.session.query(PatientAdministrator).filter(PatientAdministrato.accountID == accountID)
 			test2.update({PatientAdministrator.accountID:None})
 			test.update({PatientAdministrator.accountID:accountID})
 		db.session.commit()
