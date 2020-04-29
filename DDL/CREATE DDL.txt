@@ -56,10 +56,9 @@ create table bed (
 ) ;
 
 create table patientAdministrator (
-    adminID               int               NOT NULL,
-    adminfname          DATE,  
-    adminlname	      varchar(15)           NOT NULL,
-    employementDate	          DATE,  
+    adminID int NOT NULL,
+    adminfname DATE,  
+    adminlname varchar(15) NOT NULL,
     primary key (adminID)
 ) ;
 

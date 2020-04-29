@@ -31,13 +31,8 @@
 			</div>
 			<!-- Navbar Right Side -->
 			<div class="navbar-nav">
-			  {% if current_user.is_authenticated %}
-				<a class="nav-item nav-link" href="{{ url_for('new_assign') }}">New Assignment</a>
-				<a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
-				<a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
-			  {% else %}
+			  {% if not current_user.is_authenticated %}
 				<a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
-				<a class="nav-item nav-link" href="{{ url_for('register') }}">Register</a>
 			  {% endif %}			
 			</div>
 		  </div>
@@ -61,14 +56,14 @@
 			<div class="col-md-4">
 				<div class="content-section">
 					{% if current_user.accountname == "admin" %}
+					<!-- patientdocadmin sidebar --> 
 						<h3>Admin Sidebar</h3>
 						<p class='text-muted'>Tools
 							<ul class="list-group">
-								<li class="list-group-item list-group-item-light">Edit Account</li>
-								<li class="list-group-item list-group-item-light">Register User</li>
-								<li class="list-group-item list-group-item-light">Delete User</li>
-								<li class="list-group-item list-group-item-light">Calendars</li>
-								<li class="list-group-item list-group-item-light">etc</li>
+								<li class="list-group-item list-group-item-light">Check-In Patients</li>
+								<li class="list-group-item list-group-item-light">Check-Out Patients</li>
+								<li class="list-group-item list-group-item-light"><a href="{{ url_for('account') }}">Edit Account</a></li>
+								<li class="list-group-item list-group-item-light"><a href="{{ url_for('register') }}">Logout</a></li>
 							</ul>
 						</p>
 					{% else %}
@@ -79,7 +74,8 @@
 								<li class="list-group-item list-group-item-light">Assign Myself to a Patient</li>
 								<li class="list-group-item list-group-item-light">Assign Patient to a Bed</li>
 								<li class="list-group-item list-group-item-light">Assign Patient to a Device</li>
-								<li class="list-group-item list-group-item-light">etc</li>
+								<li class="list-group-item list-group-item-light"><a href="{{ url_for('account') }}">Edit Account</a></li>
+								<li class="list-group-item list-group-item-light"><a href="{{ url_for('register') }}">Logout</a></li>
 							</ul>
 						</p>
 					{% endif %}
