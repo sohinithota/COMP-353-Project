@@ -6,10 +6,28 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from flaskDemo import db
 from flaskDemo.models import Accounts, Bed, Doctor, MedicalDevices, Patient, PatientAdministrator
+from flaskDemo.models import getDoctor, getPatientAdministrator
 from wtforms.fields.html5 import DateField
 
 pid = Patient.query.with_entities(Patient.id)
 docid = Doctor.query.with_entities(Doctor.id)
+
+listPatientAdministrators = []
+listDoctors = []
+
+for x in getPatientAdministrator():
+	id = x.id
+	fname = x.fname
+	lname = x.lname
+	name = fname + " " + lname
+	listPatientAdministrators.append((id, name))
+
+for x in getDoctor():
+	id = x.id
+	fname = x.fname
+	lname = x.lname
+	name = fname + " " + lname
+	listDoctors.append((id, name))
 
 #  or could have used ssns = db.session.query(Department.mgr_ssn).distinct()
 # for that way, we would have imported db from flaskDemo, see above
@@ -46,23 +64,31 @@ class LoginForm(FlaskForm):
 	password = PasswordField('Password', validators=[DataRequired()])
 	submit = SubmitField('Login')
 
-class UpdateAccountForm(FlaskForm):
-	def __init__(self, choices:list):
-		self.choices = choices
-	
-	def getChoices(self)	->	list:
-		return self.choices
-		
+class UpdateDoctorAccountForm(FlaskForm):
 	accountname = StringField('Account Name',validators=[DataRequired(), Length(min=2, max=20)])
 	password = PasswordField('Password', validators=[DataRequired()])
 	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
 	picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
-	associatewithemployee = SelectField("Availible Employees", choices = getChoices, coerce = int)
+	associatewithemployee = SelectField("Availible Employees", choices = listDoctors, coerce = int)
 	submit = SubmitField('Update')
 
 	def validate_accountname(self, accountname):
-		if accountname.data != current_user.accountname:
-			user = Accounts.query.filter_by(accountName=accountname.data).first()
+		if accountname.data != current_user.accountName:
+			user = Accounts.query.filter_by(accountName=accountName.data).first()
+			if user:
+				raise ValidationError('That accountname is taken. Please choose a different one.')
+
+class UpdatePatientAdministratorAccountForm(FlaskForm):
+	accountname = StringField('Account Name',validators=[DataRequired(), Length(min=2, max=20)])
+	password = PasswordField('Password', validators=[DataRequired()])
+	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+	picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
+	associatewithemployee = SelectField("Availible Employees", choices = listPatientAdministrators, coerce = int)
+	submit = SubmitField('Update')
+
+	def validate_accountname(self, accountname):
+		if accountname.data != current_user.accountName:
+			user = Accounts.query.filter_by(accountName=accountName.data).first()
 			if user:
 				raise ValidationError('That accountname is taken. Please choose a different one.')
 

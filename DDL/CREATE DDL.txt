@@ -3,6 +3,7 @@ CREATE TABLE accounts(
     accountName VARCHAR(60),
     accountPassword VARCHAR(60),
     accountType INT,
+	image_file VARCHAR(60) NOT NULL DEFAULT 'default.jpg',
     PRIMARY KEY(id)
 );
 

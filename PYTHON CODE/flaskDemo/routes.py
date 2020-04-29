@@ -3,8 +3,9 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskDemo import app, db, bcrypt
-from flaskDemo.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, AssignForm,AssignUpdateForm
+from flaskDemo.forms import RegistrationForm, LoginForm, UpdateDoctorAccountForm, UpdatePatientAdministratorAccountForm, PostForm, AssignForm,AssignUpdateForm
 from flaskDemo.models import Accounts, Bed, Doctor, MedicalDevices, Patient, PatientAdministrator
+from flaskDemo.models import getDoctor, getPatientAdministrator
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
@@ -18,8 +19,8 @@ def login():
 	form = LoginForm()
 	if form.validate_on_submit():
 		try:
-			user = Accounts.query.filter_by(accountname=form.accountname.data).first()
-			if user and bcrypt.check_password_hash(user.password, form.password.data):
+			user = Accounts.query.filter_by(accountName=form.accountname.data).first()
+			if user and bcrypt.check_password_hash(user.accountPassword, form.password.data):
 				login_user(user)
 				next_page = request.args.get('next')
 				return redirect(next_page) if next_page else redirect(url_for('home'))
@@ -56,8 +57,8 @@ def register():
 			user = Accounts(accountName = form.accountname.data, accountPassword = hashed_password, accountType = form.accounttype.data)
 			db.session.add(user)
 			db.session.commit()
-			flash('Your account has been created! You are now able to log in', 'success')
-			return redirect(url_for('login'))
+			flash('An account has been created! You are now able to log in to it.', 'success')
+			return redirect(url_for('register'))
 		except IntegrityError:
 			flash('Invalid account information. Try again.')
 			return redirect(url_for('register'))
@@ -85,22 +86,25 @@ def save_picture(form_picture):
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
+	if current_user.accountType == 0:
+		form = UpdateDoctorAccountForm()
+	else:
+		form = UpdatePatientAdministratorAccountForm()
 	
-	form = UpdateAccountForm()
 	if form.validate_on_submit():
 		if form.picture.data:
 			picture_file = save_picture(form.picture.data)
 			current_user.image_file = picture_file
 		hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-		current_user.accountname = form.accountname.data
-		current_user.password = hashed_password
+		current_user.accountName = form.accountname.data
+		current_user.Password = hashed_password
 		db.session.commit()
 		flash('Your account has been updated!', 'success')
-		return redirect(url_for('account'))
+		return redirect(url_for('home'))
 	elif request.method == 'GET':
-		form.accountname.data = current_user.accountname
+		form.accountname.data = current_user.accountName
 	image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
-	return render_template('account.html', title='Account', image_file=image_file, form=form)
+	return render_template('account.html', title = 'Account', image_file = image_file, form = form)
 
 
 @app.route("/assign/new", methods=['GET', 'POST'])
