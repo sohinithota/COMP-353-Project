@@ -8,7 +8,6 @@ from sqlalchemy import orm
 
 db.Model.metadata.reflect(db.engine)
 
-
 class Accounts(db.Model, UserMixin):
 	__table__ = db.Model.metadata.tables['accounts']
 
@@ -18,7 +17,6 @@ class Bed(db.Model):
 class Doctor(db.Model):
 	__table__ = db.Model.metadata.tables['doctor']
 	
-
 class MedicalDevices(db.Model):
 	__table__ = db.Model.metadata.tables['medicaldevices']
 	
@@ -41,34 +39,34 @@ class PatientAdministrator(db.Model):
 		 
 @login_manager.user_loader
 def load_user(user_id):
-	return User.query.get(int(user_id))
+	return Accounts.query.get(int(user_id))
 
-# def getpatientadministrator(columns=None):
-	# u = patientadministrator.query
-	# if columns:
-		# u = u.options(orm.load_only(*columns))
-	# return u
+def getPatientAdministrator(columns=None):
+	u = PatientAdministrator.query
+	if columns:
+		u = u.options(orm.load_only(*columns))
+	return u
 	
-# def getpatientadministratorFactory(columns=None):
-	# return partial(patientadministrator, columns=columns)	  
+def getPatientAdministratorFactory(columns=None):
+	return partial(getPatientAdministrator, columns=columns)	  
 	
-# def getpatient(columns=None):
-	# u = patient.query
-	# if columns:
-		# u = u.options(orm.load_only(*columns))
-	# return u
+def getPatient(columns=None):
+	u = Patient.query
+	if columns:
+		u = u.options(orm.load_only(*columns))
+	return u
 	
-# def getpatientFactory(columns=None):
-	# return partial(getpatient, columns=columns)
+def getPatientFactory(columns=None):
+	return partial(getPatient, columns=columns)
 		
-# def getdoctor(columns=None):
-	# u = doctor.query
-	# if columns:
-		# u = u.options(orm.load_only(*columns))
-	# return u
+def getDoctor(columns=None):
+	u = Doctor.query
+	if columns:
+		u = u.options(orm.load_only(*columns))
+	return u
 	
-# def getdoctorFactory(columns=None):
-	# return partial(getdoctor, columns=columns)	  
+def getDoctorFactory(columns=None):
+	return partial(getDoctor, columns=columns)	  
 	
 # class assignment(db.Model):
 	# __table__ = db.Model.metadata.tables['assignment']

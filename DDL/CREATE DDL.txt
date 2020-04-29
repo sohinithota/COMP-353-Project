@@ -1,5 +1,5 @@
 CREATE TABLE accounts(
-    id INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     accountName VARCHAR(60),
     accountPassword VARCHAR(60),
     accountType INT,

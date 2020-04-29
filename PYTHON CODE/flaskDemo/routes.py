@@ -4,7 +4,7 @@ from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskDemo import app, db, bcrypt
 from flaskDemo.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, AssignForm,AssignUpdateForm
-from flaskDemo.models import User, Post, medicaldevices, bed, patient, doctor, assignment, patientadministrator
+from flaskDemo.models import Accounts, Bed, Doctor, MedicalDevices, Patient, PatientAdministrator
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
@@ -18,7 +18,7 @@ def login():
 	form = LoginForm()
 	if form.validate_on_submit():
 		try:
-			user = User.query.filter_by(accountname=form.accountname.data).first()
+			user = Accounts.query.filter_by(accountname=form.accountname.data).first()
 			if user and bcrypt.check_password_hash(user.password, form.password.data):
 				login_user(user)
 				next_page = request.args.get('next')
@@ -32,15 +32,15 @@ def login():
 @app.route("/home")
 @login_required
 def home():
-	results = patient.query.all()
+	results = Patient.query.all()
 	return render_template('assign_home.html', outString = results)
 	results1 = doctor.query.all()
 	return render_template('assign_home.html', outString1 = results1)
 	posts = Post.query.all()
 	return render_template('home.html', posts=posts)
 	results3 = assignment.query.all()
-	results2 = patient.query.join(assignment,patient.patientID == assignment.patientID).add_columns(patient.fname, patient.lname, patient.ssn, assignment.adminID).join(doctor, doctor.docID == assignment.docID).add_columns(doctor.docfname,doctor.doclname)
-	results = patient.query.join(assignment,patient.patientID == assignment.patientID).add_columns(patient.fname, patient.lname, patient.ssn, assignment.adminID)
+	results2 = Patient.query.join(assignment,Patient.patientID == assignment.patientID).add_columns(Patient.fname, Patient.lname, Patient.ssn, assignment.adminID).join(doctor, doctor.docID == assignment.docID).add_columns(doctor.docfname,doctor.doclname)
+	results = Patient.query.join(assignment,Patient.patientID == assignment.patientID).add_columns(Patient.fname, Patient.lname, Patient.ssn, assignment.adminID)
 	return render_template('home.html', title='Join', joined_1_n = results, joined_m_n = results2, currentUser = current_user)
 
 @app.route("/about")
@@ -53,7 +53,7 @@ def register():
 	if form.validate_on_submit():
 		try:
 			hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-			user = User(accountname=form.accountname.data, password=hashed_password, accounttype=form.accounttype.data)
+			user = Accounts(accountName = form.accountname.data, accountPassword = hashed_password, accountType = form.accounttype.data)
 			db.session.add(user)
 			db.session.commit()
 			flash('Your account has been created! You are now able to log in', 'success')
@@ -85,6 +85,7 @@ def save_picture(form_picture):
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
+	
 	form = UpdateAccountForm()
 	if form.validate_on_submit():
 		if form.picture.data:
@@ -107,14 +108,14 @@ def account():
 def new_assign():
 	form = AssignForm()
 	if form.validate_on_submit():
-		assign = patient(patfname=form.patfname.data, patlname=form.patlname.data, pid=form.pid.data)
+		assign = Patient(patfname=form.patfname.data, patlname=form.patlname.data, pid=form.pid.data)
 		assign1 = doctor(docid=form.docid.data)
 		assign2 = assignment(docid=form.docid.data, pid=form.pid.data)
 		db.session.add(assign)
 		db.session.add(assign1)
 		db.session.add(assign2)
 		db.session.commit()
-		flash('You have added a new patient!', 'success')
+		flash('You have added a new Patient!', 'success')
 		return redirect(url_for('home'))
 	return render_template('create_assign.html', title='New Assignment',
 						   form=form, legend='New Assignment')
@@ -122,13 +123,13 @@ def new_assign():
 @app.route("/assign/<docid>/<pid>")
 @login_required
 def assign(docid, pid):
-   assign = patient.query.get_or_404([docid,pid])
+   assign = Patient.query.get_or_404([docid,pid])
    return render_template('assign.html', title=str(assign.pid) + "_" + str(assign1.docid), assign=assign, now=datetime.utcnow())
 
 @app.route("/assign/<docid>/<pid>update", methods=['GET', 'POST'])
 @login_required
 def update_assign(docid, pid):
-	assign = patient.query.get_or_404([docid, pid])
+	assign = Patient.query.get_or_404([docid, pid])
 	currentAssign = assign.medcondition
 	form = AssignUpdateForm()
 	if form.validate_on_submit():		   # notice we are are not passing the dnumber from the form
@@ -148,7 +149,7 @@ def update_assign(docid, pid):
 @app.route("/assign/<docid>/<pid>delete", methods=['POST'])
 @login_required
 def delete_assign(docid, pid):
-	assign = patient.query.get_or_404([docid, pid])
+	assign = Patient.query.get_or_404([docid, pid])
 	db.session.delete(assign)
 	db.session.commit()
 	flash('The apatient assignment has been deleted!', 'success')
