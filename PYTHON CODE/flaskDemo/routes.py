@@ -3,7 +3,7 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskDemo import app, db, bcrypt
-from flaskDemo.forms import RegistrationForm, LoginForm, UpdateDoctorAccountForm, UpdatePatientAdministratorAccountForm, PostForm, AssignForm, AssignUpdateForm, CheckInForm
+from flaskDemo.forms import RegistrationForm, LoginForm, UpdateDoctorAccountForm, UpdatePatientAdministratorAccountForm, PostForm, AssignForm, AssignUpdateForm, CheckInForm, CheckOutForm
 from flaskDemo.models import Accounts, Bed, Doctor, MedicalDevices, Patient, PatientAdministrator
 from flaskDemo.models import getDoctor, getPatientAdministrator
 from flask_login import login_user, current_user, logout_user, login_required
@@ -112,7 +112,6 @@ def save_picture(form_picture):
 
 	return picture_fn
 
-
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
@@ -155,9 +154,8 @@ def checkin():
 		return redirect(url_for('home'))
 	
 	form = CheckInForm()
-	print("Before submission")
 	if form.is_submitted():
-		print("after")
+		patient = None
 		try:
 			patient = Patient(fname=form.firstName.data, minit=form.middleInit.data, lname=form.lastName.data, ssn=int(form.ssn.data), bdate=form.birthdate.data, address=form.address.data, sex=form.sex.data, arrivalTime=datetime.now(), departTime = None, medicalCondition = form.medicalCondition.data, patientadministratorID = db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == current_user.id).first().id)
 		except ValueError:
@@ -166,7 +164,22 @@ def checkin():
 		db.session.commit()
 		return redirect(url_for('home'))
 	return render_template('checkin.html', title = 'Check In Patient', form = form)
+	
+@app.route("/checkout", methods=["GET", "POST"])
+@login_required
+def checkout():
+	if current_user.accountType != 1:
+		return redirect(url_for('home'))
+	
+	form = CheckOutForm()
+	if form.is_submitted():
+		patient = db.session.query(Patient).filter(Patient.id == form.patientSelection.data).first()
+		db.session.delete(patient)
+		db.session.commit()
+		return redirect(url_for('home'))
+	return render_template('checkout.html', title='Check-Out Patient', form=form)
 
+		
 @app.route("/assign/new", methods=['GET', 'POST'])
 @login_required
 def new_assign():
