@@ -97,7 +97,7 @@ def account():
 			current_user.image_file = picture_file
 		hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 		current_user.accountName = form.accountname.data
-		current_user.Password = hashed_password
+		current_user.accountPassword = hashed_password
 		db.session.commit()
 		flash('Your account has been updated!', 'success')
 		return redirect(url_for('home'))
