@@ -98,6 +98,18 @@ def account():
 		hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 		current_user.accountName = form.accountname.data
 		current_user.accountPassword = hashed_password
+		
+		accountID = current_user.id
+		if current_user.accountType == 0:
+			test = db.session.query(Doctor).filter(Doctor.id == form.associatewithemployee.data)
+			test2 = db.session.query(Doctor).filter(Doctor.accountID == accountID)
+			test2.update({Doctor.accountID:None})
+			test.update({Doctor.accountID:accountID})
+		else:
+			test = db.session.query(PatientAdministrator).filter(PatientAdministrator.id == form.associatewithemployee.data)
+			test2 = db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == accountID)
+			test2.update({PatientAdministrator.accountID:None})
+			test.update({PatientAdministrator.accountID:accountID})
 		db.session.commit()
 		flash('Your account has been updated!', 'success')
 		return redirect(url_for('home'))
@@ -105,7 +117,6 @@ def account():
 		form.accountname.data = current_user.accountName
 	image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
 	return render_template('account.html', title = 'Account', image_file = image_file, form = form)
-
 
 @app.route("/assign/new", methods=['GET', 'POST'])
 @login_required
