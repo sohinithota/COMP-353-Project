@@ -2,6 +2,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
+from random import randint
+import os.path
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
@@ -17,3 +19,31 @@ from flaskDemo import routes
 from flaskDemo import models
 
 models.db.create_all()
+
+if os.path.isfile("log.txt"):
+	pass
+else:
+	with open("log.txt", "w") as f:
+		f.write("Randomly assigning Patient Administrators to Patients...")
+
+		paID = []
+		pID = []
+
+		for x in models.getPatientAdministrator():
+			paID.append(x.id)
+
+		for x in models.getPatient():
+			pID.append(x.id)
+
+		max = 9
+		for x in pID:
+			if max == 0:
+				assignedPAID = paID[0]
+			else:
+				assignedPAID = paID.pop(randint(0,max))
+				max = max - 1
+			test = db.session.query(models.Patient).filter(models.Patient.id == x)
+			test.update({models.Patient.patientadministratorID:assignedPAID})
+		db.session.commit()
+		f.write("Task complete")
+		f.close()
