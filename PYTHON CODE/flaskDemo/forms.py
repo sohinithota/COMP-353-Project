@@ -5,7 +5,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextA
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError,Regexp
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from flaskDemo import db
-from flaskDemo.models import User, patient, getpatient, getpatientFactory, doctor, getdoctor, getdoctorFactory, assignment, getassignment, getassignmentFactory
+from flaskDemo.models import User, patient, getpatient, getpatientFactory, doctor, getdoctor, getdoctorFactory, assignment, getassignment, getassignmentFactory, patientadministrator, getpatientadministrator, getpatientadministratorFactory
 from wtforms.fields.html5 import DateField
 
 pid = patient.query.with_entities(patient.patientID)
@@ -47,10 +47,17 @@ class LoginForm(FlaskForm):
 	submit = SubmitField('Login')
 
 class UpdateAccountForm(FlaskForm):
+	def __init__(self, choices:list):
+		self.choices = choices
+	
+	def getChoices(self)	->	list:
+		return self.choices
+		
 	accountname = StringField('Account Name',validators=[DataRequired(), Length(min=2, max=20)])
 	password = PasswordField('Password', validators=[DataRequired()])
 	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
 	picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
+	associatewithemployee = SelectField("Availible Employees", choices = getChoices, coerce = int)
 	submit = SubmitField('Update')
 
 	def validate_accountname(self, accountname):

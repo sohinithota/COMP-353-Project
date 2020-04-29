@@ -1,36 +1,154 @@
-INSERT INTO patient
-(patientID,patfname,patminit,patlname,ssn,bdate,address,sex,arrivalTime,departTime,medcondition,adminID,inBed,bedID)
-values
-(101,'James', 'E', 'Borg', '888665555', '1937-11-10', '450 Stone, Houston TX', 'M','2020-03-19 06:10:00','2020-03-19 06:10:00','Flu',111, 'N', NULL),
-(102,'John', 'B', 'Smith', '123456789', '1965-01-09', '731 Fondren, Houston TX', 'M','2020-03-22 07:20:00',NULL, 'Covid-19',111, 'Y', 5),
-(103,'Franklin', 'T', 'Wong', '333445555', '1955-12-08', '638 Voss, Houston TX', 'M','2020-03-23 08:10:55','NULL', 'Covid-19',222, 'Y',4),
-(104,'Alicia', 'J', 'Zelaya', '999887777', '1968-01-19', '3321 Castle, Spring TX', 'F','2020-03-24 06:30:00','2020-03-19 06:10:00', 'Fever',333, 'N', NULL),
-(105,'Jennifer', 'S', 'Wallace', '987654321', '1941-06-20', '291 Berry, Bellaire TX', 'F','2020-03-25 07:40:00','2020-03-19 06:10:00', 'Collitis',222,'N', NULL),
-(106,'Ramesh', 'K', 'Narayan', '666884444', '1962-09-15', '975 Fire Oak, Humble TX', 'M','2020-03-27 08:15:20','NULL', 'Covid-19',333, 'Y', 6),
-(107,'Joyce', 'A', 'English', '453453453', '1972-07-31', '5631 Rice, Houston TX', 'F','2020-03-28 09:50:30','2020-03-19 06:10:00', 'Pneumonia',444, 'N', NULL),
-(108,'Ahmad', 'V', 'Jabbar', '987987987', '1969-03-29', '980 Dallas, Houston TX', 'M','2020-03-30 22:15:00','2020-03-19 06:10:00', 'Flu',444, 'N', NULL),
-(109,'Jenny', 'K', 'minto', '867556436', '19-03-2002', '123 paola dr, Tampa FL', 'F','2020-04-11 20:10:00','2020-04-17 05:00:00', 'Flu',444, 'N', NULL);
+INSERT INTO bed(id, occupied, clean)
+VALUES(0, FALSE, TRUE),(1, FALSE, TRUE),(2, FALSE, TRUE),(3, FALSE, TRUE),(4, FALSE, TRUE),(5, FALSE, TRUE),(6, FALSE, TRUE),(7, FALSE, TRUE),(8, FALSE, TRUE),(9, FALSE, TRUE);
 
-INSERT INTO doctor 
-(docID,adminID,speciality,docfname,doclname,employmentDate,deviceID)
-values
-(201, 111, 'Internal Medicine', 'Smith', 'Allen', '2002-10-10', 999),
-(301, 222, 'Internal Medicine', 'Patricia', 'Rosas', '2010-09-15', 888),
-(401, 333, 'Family Medicine', 'David', 'Mann', '2008-01-10', 999),
-(501, 444, 'Family Medicine', 'Johnson', 'Davis' ,'2009-07-19', 888);
+INSERT INTO doctor(id, fname, lname, accountID)
+VALUES(10, 'Smith', 'Allen', NULL),(11, 'Patricia', 'Rosas', NULL),(12, 'David', 'Mann', NULL),(13, 'Johnson', 'Davis', NULL),(14, 'Nick', 'Synovic', NULL),(15, 'Sohini', 'Thota', NULL),(16, 'Anjani', 'Kuruganti', NULL),(17, 'Sara', 'Asoofi', NULL),(18, 'Will', 'Billiam', NULL),(
+    19,
+    'Spongebob',
+    'Squarepants',
+    NULL
+);
 
-INSERT INTO bed
-(bedID,occupied,clean)
-values
-(4, 'Y', 'Y'),
-(5, 'Y', 'Y'),
-(6, 'Y', 'Y');
+INSERT INTO medicaldevices(id, devicename)
+VALUES(20, 'Stethoscope'), (21, 'Thermometer');
 
-INSERT INTO medicaldevices
-(deviceID,devicename)
-values
-(999, 'Stethoscope'),
-(888, 'Thermometer');
+INSERT INTO patient(
+    id,
+    fname,
+    minit,
+    lname,
+    ssn,
+    bdate,
+    address,
+    sex,
+    arrivalTime,
+    departTime,
+    medicalCondition
+)
+VALUES(
+    100,
+    'Kent',
+    'E',
+    'Borg',
+    '000000000',
+    '1937-11-10',
+    '450 Stone, Tampa FL',
+    'M',
+    '2020-03-19 06:10:00',
+    '2020-03-19 06:10:00',
+    'Flu'
+),(
+    101,
+    'John',
+    'B',
+    'Smit',
+    '100000000',
+    '1965-01-09',
+    '731 Fondr, Tampa FL',
+    'M',
+    '2020-03-22 07:20:00',
+    NULL,
+    'Covid-19'
+),(
+    102,
+    'Fran',
+    'T',
+    'Wong',
+    '200000000',
+    '1955-12-08',
+    '638 Vosse, Tampa FL',
+    'M',
+    '2020-03-23 08:10:55',
+    'NULL',
+    'Covid-19'
+),(
+    103,
+    'John',
+    'J',
+    'Zela',
+    '300000000',
+    '1968-01-19',
+    '3321 Cast, Tampa FL',
+    'F',
+    '2020-03-24 06:30:00',
+    '2020-03-19 06:10:00',
+    'Fever'
+),(
+    104,
+    'Jenn',
+    'S',
+    'Wall',
+    '400000000',
+    '1941-06-20',
+    '291 Berry, Tampa FL',
+    'F',
+    '2020-03-25 07:40:00',
+    '2020-03-19 06:10:00',
+    'Collitis'
+),(
+    105,
+    'Rame',
+    'K',
+    'Nara',
+    '500000000',
+    '1962-09-15',
+    '975 Firee, Tampa FL',
+    'M',
+    '2020-03-27 08:15:20',
+    'NULL',
+    'Covid-19'
+),(
+    106,
+    'Joye',
+    'A',
+    'Engl',
+    '600000000',
+    '1972-07-31',
+    '5631 Rice, Tampa FL',
+    'F',
+    '2020-03-28 09:50:30',
+    '2020-03-19 06:10:00',
+    'Pneumonia'
+),(
+    107,
+    'Ahma',
+    'V',
+    'Jabb',
+    '700000000',
+    '1969-03-29',
+    '980 Dalla, Tampa FL',
+    'M',
+    '2020-03-30 22:15:00',
+    '2020-03-19 06:10:00',
+    'Flu'
+),(
+    108,
+    'Jenn',
+    'K',
+    'Mint',
+    '800000000',
+    '19-03-2002',
+    '123 Paola, Tampa FL',
+    'F',
+    '2020-04-11 20:10:00',
+    '2020-04-17 05:00:00',
+    'Flu'
+),(
+    109,
+    'Nich',
+    'M',
+    'Sink',
+    '900000000',
+    '19-03-2002',
+    '123 Paola, Tampa FL',
+    'M',
+    '2020-04-11 20:10:00',
+    '2020-04-17 05:00:00',
+    'Flu'
+);
+
+INSERT INTO patientadministrator(id, fname, lname)
+VALUES(30, 'Jim', 'Bob'),(31, 'Joe', 'Smo'),(32, 'Bar', 'Mos'),(33, 'Bim', 'Dos'),(34, 'Tim', 'Tos'),(35, 'Sim', 'Can'),(36, 'Ham', 'Tan'),(37, 'Pam', 'Tin'),(38, 'Sam', 'Bin'),(39, 'Jam', 'Cob');
 
 INSERT INTO assignment
 (adminID,patientID,docID)
