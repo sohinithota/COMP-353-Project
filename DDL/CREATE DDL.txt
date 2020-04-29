@@ -19,13 +19,12 @@ create table patient (
 ) ;
 
 create table doctor (
-    docID                  int                                   NOT NULL,
-	adminID            int                NOT NULL,
-    speciality        varchar(15)        NOT NULL,
-	docfname		      varchar(15)		 NOT NULL,
-	doclname		      varchar(15)		 NOT NULL,
-	employmentDate	  DATE,
-	deviceID	   int		 NOT NULL,
+    docID int NOT NULL,
+	adminID int NOT NULL,
+    speciality varchar(15) NOT NULL,
+	docfname varchar(15) NOT NULL,
+	doclname varchar(15) NOT NULL,
+	deviceID int NOT NULL,
     primary key (docID)
     -- foreign key (adminID) references patientdocadmin(adminID),	
 	-- foreign key (deviceID) references medicaldevices(deviceID)	
