@@ -3,7 +3,7 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskDemo import app, db, bcrypt
-from flaskDemo.forms import RegistrationForm, LoginForm, UpdateDoctorAccountForm, UpdatePatientAdministratorAccountForm, PostForm, AssignForm,AssignUpdateForm
+from flaskDemo.forms import RegistrationForm, LoginForm, UpdateDoctorAccountForm, UpdatePatientAdministratorAccountForm, PostForm, AssignForm, AssignUpdateForm, CheckInForm
 from flaskDemo.models import Accounts, Bed, Doctor, MedicalDevices, Patient, PatientAdministrator
 from flaskDemo.models import getDoctor, getPatientAdministrator
 from flask_login import login_user, current_user, logout_user, login_required
@@ -33,20 +33,33 @@ def login():
 @app.route("/home")
 @login_required
 def home():
+	data = []
 	if current_user.accountType == 1:
 		currentPatientAdmin = db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == current_user.id).first()
 		assignedPatients = db.session.query(Patient).filter(Patient.patientadministratorID == currentPatientAdmin.id).all()
-		data = []
 		for x in assignedPatients:
 			if (x.departTime is None):
 				if (x.minit is None) or (x.minit == ""):
 					name = x.fname + " " + x.lname
 				else:
 					name = x.fname + " " + x.minit + " " + x.lname
-				data.append({"name":name, "id":x.id, "ssn":x.ssn, "arrivalTime":x.arrivalTime, "medicalCondition":x.medicalCondition, "inBed":x.inBed, "bedID":x.bedID, "doctorID":x.doctorID})
+				data.append({"name":name, "id":x.id, "ssn":x.ssn, "arrivalTime":x.arrivalTime, "address":x.address, "medicalCondition":x.medicalCondition, "inBed":x.inBed, "bedID":x.bedID, "doctorID":x.doctorID})
 			else:
 				pass
-		return render_template('assign_home.html', patientInformation = data)
+	else:
+		currentDoctor = db.session.query(Doctor).filter(Doctor.accountID == current_user.id).first()
+		assignedPatients = db.session.query(Patient).filter(Patient.doctorID == currentDoctor.id).all()
+		for x in assignedPatients:
+			if (x.departTime is None):
+				if (x.minit is None) or (x.minit == ""):
+					name = x.fname + " " + x.lname
+				else:
+					name = x.fname + " " + x.minit + " " + x.lname
+				data.append({"name":name, "id":x.id, "ssn":x.ssn, "arrivalTime":x.arrivalTime, "sex":x.sex, "medicalCondition":x.medicalCondition, "inBed":x.inBed, "bedID":x.bedID, "patientadministratorID":x.doctorID})
+			else:
+				pass
+	return render_template('assign_home.html', patientInformation = data)
+	
 	# results = Patient.query.all()
 	# return render_template('assign_home.html', outString = results)
 	# results1 = doctor.query.all()
@@ -131,6 +144,21 @@ def account():
 		form.accountname.data = current_user.accountName
 	image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
 	return render_template('account.html', title = 'Account', image_file = image_file, form = form)
+
+@app.route("/checkin", methods = ['GET', 'POST'])
+@login_required
+def checkin():
+	if current_user.accountType != 1:
+		return redirect(url_for('home'))
+	
+	form = CheckInForm()
+	print("FUCK")
+	if form.validate_on_submit():
+		patient = Patient(fname=form.firstName.data, minit=form.middleInit.data, lname=form.lastName.data, ssn=form.ssn.data, bdate=form.birthdate.data, address=form.address.data, sex=form.sex.data, arrivalTime=datetime.now(), departTime = None, medicalCondition = form.medicalCondition.data, patientadministratorID = db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == current_user.id).first().id)
+		db.session.add(patient)
+		db.session.commit()
+		return redirect(url_for('home'))
+	return render_template('checkin.html', title = 'Check In Patient', form = form)
 
 @app.route("/assign/new", methods=['GET', 'POST'])
 @login_required

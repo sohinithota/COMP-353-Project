@@ -9,11 +9,13 @@
             </div>
 			<h2><a class="article-title" href="#">Patient Information</a></h2>
 			<p>
+				{% if current_user.accountType == 1 %}
 				<ul>
 					<li>Patient Name: {{x.name}}</li>
 					<li>Patient ID: {{x.id}}</li>
 					<li>Patient SSN: {{x.ssn}}</li>
 					<li>Patient Arrival Time: {{x.arrivalTime}}</li>
+					<li>Patient Address: {{x.address}}</li>
 					<li>Patient Medical Condition: {{x.medicalCondition}}</li>
 					<ul>
 						<li>Patient's Assigned Doctor ID: {{x.doctorID}}</li>
@@ -22,6 +24,22 @@
 						{% endif %}
 					</ul>
 				</ul>
+				{% else %}
+				<ul>
+					<li>Patient Name: {{x.name}}</li>
+					<li>Patient ID: {{x.id}}</li>
+					<li>Patient SSN: {{x.ssn}}</li>
+					<li>Patient Arrival Time: {{x.arrivalTime}}</li>
+					<li>Patient Medical Condition: {{x.medicalCondition}}</li>
+					<ul>
+						<li>Patient's Assigned Patient Administrator ID: {{x.patientadministratorID}}</li>
+						{% if x.inBed == 1 %}
+						<li>Patient's Bed ID: {{x.bedID}}</li>
+						
+						{% endif %}
+					</ul>
+				</ul>
+				{% endif %}
 			</p>
 		  </div>		  
         </article>

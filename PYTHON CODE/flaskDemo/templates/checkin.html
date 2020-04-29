@@ -1,0 +1,116 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+    <form method="POST" action="{{url_for('checkin')}}">
+        <fieldset class="form-group">
+			<div class="form-group">
+                {{ form.firstName.label(class="form-control-label") }}
+                {% if form.firstName.errors %}
+                    {{ form.firstName(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.firstName.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.firstName(class="form-control form-control-lg") }}
+				{% endif %}
+            </div>
+			<div class="form-group">
+                {{ form.lastName.label(class="form-control-label") }}
+                {% if form.lastName.errors %}
+                    {{ form.lastName(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.lastName.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.lastName(class="form-control form-control-lg") }}
+				{% endif %}
+            </div>
+			<div class="form-group">
+                {{ form.middleInit.label(class="form-control-label") }}
+                {% if form.middleInit.errors %}
+                    {{ form.middleInit(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.middleInit.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.middleInit(class="form-control form-control-lg") }}
+				{% endif %}
+            </div>
+			<div class="form-group">
+                {{ form.ssn.label(class="form-control-label") }}
+                {% if form.ssn.errors %}
+                    {{ form.ssn(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.ssn.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.ssn(class="form-control form-control-lg") }}
+				{% endif %}
+            </div>
+			<div class="form-group">
+                {{ form.birthdate.label(class="form-control-label") }}
+                {% if form.birthdate.errors %}
+                    {{ form.birthdate(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.birthdate.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.birthdate(class="form-control form-control-lg") }}
+				{% endif %}
+			</div>
+			<div class="form-group">
+                {{ form.address.label(class="form-control-label") }}
+                {% if form.address.errors %}
+                    {{ form.address(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.address.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.address(class="form-control form-control-lg") }}
+				{% endif %}
+			</div>
+			<div class="form-group">
+                {{ form.sex.label(class="form-control-label") }}
+                {% if form.sex.errors %}
+                    {{ form.sex(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.sex.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.sex(class="form-control form-control-lg") }}
+				{% endif %}
+			</div>
+			<div class="form-group">
+                {{ form.medicalCondition.label(class="form-control-label") }}
+                {% if form.medicalCondition.errors %}
+                    {{ form.medicalCondition(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.medicalCondition.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.medicalCondition(class="form-control form-control-lg") }}
+				{% endif %}
+			</div>
+        </fieldset>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
+</div>
+{% endblock content %}

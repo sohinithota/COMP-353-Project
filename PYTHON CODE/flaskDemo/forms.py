@@ -97,6 +97,19 @@ class PostForm(FlaskForm):
 	content = TextAreaField('Content', validators=[DataRequired()])
 	submit = SubmitField('Post')
 
+class CheckInForm(FlaskForm):
+	firstName = StringField("First Name", validators = [DataRequired()])
+	lastName = StringField("Last Name",  validators = [DataRequired()])
+	middleInit = StringField("Middle Initial")
+	ssn = StringField("SSN",  validators = [DataRequired(), Length(min=9, max=9)])
+	birthdate = DateField("Birthdate", validators = [DataRequired()])
+	address = StringField("Address", validators = [DataRequired()])
+	sex = StringField("Sex", validators = [DataRequired(), Length(min=1, max=1)])
+	medicalCondition = StringField("Medical Condition", validators = [DataRequired()])
+	submit = SubmitField('Check In Patient')
+	
+	def validate_ssn(self, ssn):
+		return True
 	
 class AssignUpdateForm(FlaskForm):
 
