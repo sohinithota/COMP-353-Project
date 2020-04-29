@@ -108,9 +108,6 @@ class CheckInForm(FlaskForm):
 	medicalCondition = StringField("Medical Condition", validators = [DataRequired()])
 	submit = SubmitField('Check In Patient')
 	
-	def validate_ssn(self, ssn):
-		return True
-	
 class AssignUpdateForm(FlaskForm):
 
 #	 dnumber=IntegerField('Department Number', validators=[DataRequired()])

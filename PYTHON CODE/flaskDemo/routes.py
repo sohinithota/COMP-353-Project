@@ -33,31 +33,34 @@ def login():
 @app.route("/home")
 @login_required
 def home():
-	data = []
-	if current_user.accountType == 1:
-		currentPatientAdmin = db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == current_user.id).first()
-		assignedPatients = db.session.query(Patient).filter(Patient.patientadministratorID == currentPatientAdmin.id).all()
-		for x in assignedPatients:
-			if (x.departTime is None):
-				if (x.minit is None) or (x.minit == ""):
-					name = x.fname + " " + x.lname
+	try:
+		data = []
+		if current_user.accountType == 1:
+			currentPatientAdmin = db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == current_user.id).first()
+			assignedPatients = db.session.query(Patient).filter(Patient.patientadministratorID == currentPatientAdmin.id).all()
+			for x in assignedPatients:
+				if (x.departTime is None):
+					if (x.minit is None) or (x.minit == ""):
+						name = x.fname + " " + x.lname
+					else:
+						name = x.fname + " " + x.minit + " " + x.lname
+					data.append({"name":name, "id":x.id, "ssn":x.ssn, "arrivalTime":x.arrivalTime, "address":x.address, "medicalCondition":x.medicalCondition, "inBed":x.inBed, "bedID":x.bedID, "doctorID":x.doctorID})
 				else:
-					name = x.fname + " " + x.minit + " " + x.lname
-				data.append({"name":name, "id":x.id, "ssn":x.ssn, "arrivalTime":x.arrivalTime, "address":x.address, "medicalCondition":x.medicalCondition, "inBed":x.inBed, "bedID":x.bedID, "doctorID":x.doctorID})
-			else:
-				pass
-	else:
-		currentDoctor = db.session.query(Doctor).filter(Doctor.accountID == current_user.id).first()
-		assignedPatients = db.session.query(Patient).filter(Patient.doctorID == currentDoctor.id).all()
-		for x in assignedPatients:
-			if (x.departTime is None):
-				if (x.minit is None) or (x.minit == ""):
-					name = x.fname + " " + x.lname
+					pass
+		else:
+			currentDoctor = db.session.query(Doctor).filter(Doctor.accountID == current_user.id).first()
+			assignedPatients = db.session.query(Patient).filter(Patient.doctorID == currentDoctor.id).all()
+			for x in assignedPatients:
+				if (x.departTime is None):
+					if (x.minit is None) or (x.minit == ""):
+						name = x.fname + " " + x.lname
+					else:
+						name = x.fname + " " + x.minit + " " + x.lname
+					data.append({"name":name, "id":x.id, "ssn":x.ssn, "arrivalTime":x.arrivalTime, "sex":x.sex, "medicalCondition":x.medicalCondition, "inBed":x.inBed, "bedID":x.bedID, "patientadministratorID":x.doctorID})
 				else:
-					name = x.fname + " " + x.minit + " " + x.lname
-				data.append({"name":name, "id":x.id, "ssn":x.ssn, "arrivalTime":x.arrivalTime, "sex":x.sex, "medicalCondition":x.medicalCondition, "inBed":x.inBed, "bedID":x.bedID, "patientadministratorID":x.doctorID})
-			else:
-				pass
+					pass
+	except AttributeError:
+		return redirect(url_for('account'))
 	return render_template('assign_home.html', patientInformation = data)
 	
 	# results = Patient.query.all()
@@ -134,7 +137,7 @@ def account():
 			test.update({Doctor.accountID:accountID})
 		else:
 			test = db.session.query(PatientAdministrator).filter(PatientAdministrator.id == form.associatewithemployee.data)
-			test2 = db.session.query(PatientAdministrator).filter(PatientAdministrato.accountID == accountID)
+			test2 = db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == accountID)
 			test2.update({PatientAdministrator.accountID:None})
 			test.update({PatientAdministrator.accountID:accountID})
 		db.session.commit()
@@ -152,9 +155,13 @@ def checkin():
 		return redirect(url_for('home'))
 	
 	form = CheckInForm()
-	print("FUCK")
-	if form.validate_on_submit():
-		patient = Patient(fname=form.firstName.data, minit=form.middleInit.data, lname=form.lastName.data, ssn=form.ssn.data, bdate=form.birthdate.data, address=form.address.data, sex=form.sex.data, arrivalTime=datetime.now(), departTime = None, medicalCondition = form.medicalCondition.data, patientadministratorID = db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == current_user.id).first().id)
+	print("Before submission")
+	if form.is_submitted():
+		print("after")
+		try:
+			patient = Patient(fname=form.firstName.data, minit=form.middleInit.data, lname=form.lastName.data, ssn=int(form.ssn.data), bdate=form.birthdate.data, address=form.address.data, sex=form.sex.data, arrivalTime=datetime.now(), departTime = None, medicalCondition = form.medicalCondition.data, patientadministratorID = db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == current_user.id).first().id)
+		except ValueError:
+			redirect(url_for('checkin'))
 		db.session.add(patient)
 		db.session.commit()
 		return redirect(url_for('home'))
