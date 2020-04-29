@@ -33,7 +33,7 @@ class RegistrationForm(FlaskForm):
 	accountname = StringField('Account Name', validators=[DataRequired(), Length(min=2, max=20)])
 	password = PasswordField('Password', validators=[DataRequired()])
 	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
-	accounttype = SelectField("Account Type", choices=[(0, "Doctor"), (1, "Patient Admin")])
+	accounttype = SelectField("Account Type", choices=[(0, "Doctor"), (1, "Patient Admin")], coerce = int)
 	submit = SubmitField('Create Account')
 
 	def validate_accountname(self, accountname):
