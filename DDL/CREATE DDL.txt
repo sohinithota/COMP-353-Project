@@ -58,3 +58,9 @@ CREATE TABLE patientadministrator(
     PRIMARY KEY(id)
     -- foreign key (accountID) references user(id)
 );
+create table assignment(
+    adminID               int               NOT NULL, 
+    patientID	          int               NOT NULL,
+    docID	              int               NOT NULL,  
+    primary key (patientID,docID,adminID)
+) ;
