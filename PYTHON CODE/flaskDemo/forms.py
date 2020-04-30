@@ -12,16 +12,9 @@ from wtforms.fields.html5 import DateField
 pid = Patient.query.with_entities(Patient.id)
 docid = Doctor.query.with_entities(Doctor.id)
 
-listPatientAdministrators = []
+
 listDoctors = []
 listAvailiblePatients = []
-
-for x in getPatientAdministrator():
-	id = x.id
-	fname = x.fname
-	lname = x.lname
-	name = fname + " " + lname
-	listPatientAdministrators.append((id, name))
 
 for x in getDoctor():
 	id = x.id
@@ -88,6 +81,15 @@ class UpdateDoctorAccountForm(FlaskForm):
 				raise ValidationError('That accountname is taken. Please choose a different one.')
 
 class UpdatePatientAdministratorAccountForm(FlaskForm):
+	listPatientAdministrators = []
+	for x in getPatientAdministrator():
+		if x.accountID is None:
+			id = x.id
+			fname = x.fname
+			lname = x.lname
+			name = fname + " " + lname
+			listPatientAdministrators.append((id, name))
+		
 	accountname = StringField('Account Name',validators=[DataRequired(), Length(min=2, max=20)])
 	picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
 	associatewithemployee = SelectField("Availible Employees", choices = listPatientAdministrators, coerce = int)
