@@ -3,7 +3,7 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskDemo import app, db, bcrypt
-from flaskDemo.forms import RegistrationForm, LoginForm, UpdateDoctorAccountForm, UpdatePatientAdministratorAccountForm, PostForm, AssignForm, AssignUpdateForm, CheckInForm, CheckOutForm
+from flaskDemo.forms import RegistrationForm, LoginForm, UpdateDoctorAccountForm, UpdatePatientAdministratorAccountForm, CheckInForm, CheckOutForm, DocToPatientForm
 from flaskDemo.models import Accounts, Bed, Doctor, MedicalDevices, Patient, PatientAdministrator
 from flaskDemo.models import getDoctor, getPatientAdministrator, getPatient
 from flask_login import login_user, current_user, logout_user, login_required
@@ -112,10 +112,8 @@ def home():
 					name = x.fname + " " + x.minit + " " + x.lname
 				data.append({"name":name, "id":x.id, "ssn":x.ssn, "arrivalTime":x.arrivalTime, "sex":x.sex, "medicalCondition":x.medicalCondition, "inBed":x.inBed, "bedID":x.bedID, "patientadministratorID":x.doctorID})
 	except AttributeError as error:
-		print(traceback.format_exc())
-		print(error)
 		return redirect(url_for('account'))
-	return render_template('assign_home.html', patientInformation = data)
+	return render_template('home.html', patientInformation = data)
 	
 	# results = Patient.query.all()
 	# return render_template('assign_home.html', outString = results)
@@ -146,6 +144,7 @@ def save_picture(form_picture):
 
 	return picture_fn
 
+# Patient Admin Specific Route
 @app.route("/checkin", methods = ['GET', 'POST'])
 @login_required
 def checkin():
@@ -168,7 +167,8 @@ def checkin():
 		db.session.commit()
 		return redirect(url_for('home'))
 	return render_template('checkin.html', title = 'Check In Patient', form = form)
-	
+
+# Patient Admin Specific Route
 @app.route("/checkout", methods=["GET", "POST"])
 @login_required
 def checkout():
@@ -183,7 +183,6 @@ def checkout():
 			currentPAID = x.id
 	
 	for x in getPatient():
-		print(x.patientadministratorID)
 		if x.patientadministratorID == currentPAID:
 			name = None
 			id = x.id
@@ -205,55 +204,95 @@ def checkout():
 		return redirect(url_for('home'))
 	return render_template('checkout.html', title='Check-Out Patient', form=form)
 
-		
-@app.route("/assign/new", methods=['GET', 'POST'])
+# Doctor Specific Route
+@app.route("/doctopatient", methods=['GET', 'POST'])
 @login_required
-def new_assign():
-	form = AssignForm()
-	if form.validate_on_submit():
-		assign = Patient(patfname=form.patfname.data, patlname=form.patlname.data, pid=form.pid.data)
-		assign1 = doctor(docid=form.docid.data)
-		assign2 = assignment(docid=form.docid.data, pid=form.pid.data)
-		db.session.add(assign)
-		db.session.add(assign1)
-		db.session.add(assign2)
+def doctopatient():
+	if current_user.accountType != 0:
+		return redirect(url_for("home"))
+	
+	listAvailiblePatients = []
+	currentDocID = None
+	
+	for x in getDoctor():
+		if x.accountID == current_user.id:
+			currentDocID = x.id
+	print(currentDocID)
+	
+	for x in getPatient():
+		if x.doctorID is None:
+			name = None
+			id = x.id
+			fname = x.fname
+			lname = x.lname
+			minit = x.minit
+			if minit is None:
+				name = fname + " " + lname
+			else:
+				name = fname + " " + minit + " " + lname
+			listAvailiblePatients.append((id, name))
+	
+	form = DocToPatientForm()
+	form.patientSelection.choices = listAvailiblePatients
+	
+	if form.is_submitted():
+		print(form.patientSelection.data)
+		patient = db.session.query(Patient).filter(Patient.id == form.patientSelection.data).first()
+		patient.update({Patient.doctorID:currentDocID})
 		db.session.commit()
-		flash('You have added a new Patient!', 'success')
+		flash('Your account has been updated!', 'success')
 		return redirect(url_for('home'))
-	return render_template('create_assign.html', title='New Assignment',
-						   form=form, legend='New Assignment')
+	return render_template("doctopatient.html", title="Assign to Patient", form=form)
+		
 
-@app.route("/assign/<docid>/<pid>")
-@login_required
-def assign(docid, pid):
-   assign = Patient.query.get_or_404([docid,pid])
-   return render_template('assign.html', title=str(assign.pid) + "_" + str(assign1.docid), assign=assign, now=datetime.utcnow())
+# @app.route("/assign/new", methods=['GET', 'POST'])
+# @login_required
+# def new_assign():
+	# form = AssignForm()
+	# if form.validate_on_submit():
+		# assign = Patient(patfname=form.patfname.data, patlname=form.patlname.data, pid=form.pid.data)
+		# assign1 = doctor(docid=form.docid.data)
+		# assign2 = assignment(docid=form.docid.data, pid=form.pid.data)
+		# db.session.add(assign)
+		# db.session.add(assign1)
+		# db.session.add(assign2)
+		# db.session.commit()
+		# flash('You have added a new Patient!', 'success')
+		# return redirect(url_for('home'))
+	# return render_template('create_assign.html', title='New Assignment',
+						   # form=form, legend='New Assignment')
 
-@app.route("/assign/<docid>/<pid>update", methods=['GET', 'POST'])
-@login_required
-def update_assign(docid, pid):
-	assign = Patient.query.get_or_404([docid, pid])
-	currentAssign = assign.medcondition
-	form = AssignUpdateForm()
-	if form.validate_on_submit():		   # notice we are are not passing the dnumber from the form
-		if currentAssign !=form.medcondition.data:
-			assign.medcondition=form.medcondition.data
-		assign.pid=form.pid.data
-		db.session.commit()
-		flash('Your assignment has been updated!', 'success')
-		return redirect(url_for('assign', pid=pid))
-	elif request.method == 'GET':			   # notice we are not passing the dnumber to the form
+# @app.route("/assign/<docid>/<pid>")
+# @login_required
+# def assign(docid, pid):
+   # assign = Patient.query.get_or_404([docid,pid])
+   # return render_template('assign.html', title=str(assign.pid) + "_" + str(assign1.docid), assign=assign, now=datetime.utcnow())
 
-		form.pid.data = assign.pid
-		form.medcondition.data = assign.medcondition
-	return render_template('create_assign.html', title='Update Assignment',
-						   form=form, legend='Update Assignment')
+# @app.route("/assign/<docid>/<pid>update", methods=['GET', 'POST'])
+# @login_required
+# def update_assign(docid, pid):
+	# assign = Patient.query.get_or_404([docid, pid])
+	# currentAssign = assign.medcondition
+	# form = AssignUpdateForm()
+	# if form.validate_on_submit():		   # notice we are are not passing the dnumber from the form
+		# if currentAssign !=form.medcondition.data:
+			# assign.medcondition=form.medcondition.data
+		# assign.pid=form.pid.data
+		# db.session.commit()
+		# flash('Your assignment has been updated!', 'success')
+		# return redirect(url_for('assign', pid=pid))
+	# elif request.method == 'GET':			   # notice we are not passing the dnumber to the form
 
-@app.route("/assign/<docid>/<pid>delete", methods=['POST'])
-@login_required
-def delete_assign(docid, pid):
-	assign = Patient.query.get_or_404([docid, pid])
-	db.session.delete(assign)
-	db.session.commit()
-	flash('The apatient assignment has been deleted!', 'success')
-	return redirect(url_for('home'))
+		# form.pid.data = assign.pid
+		# form.medcondition.data = assign.medcondition
+	# return render_template('create_assign.html', title='Update Assignment',
+						   # form=form, legend='Update Assignment')
+
+# @app.route("/assign/<docid>/<pid>delete", methods=['POST'])
+# @login_required
+# def delete_assign(docid, pid):
+	# assign = Patient.query.get_or_404([docid, pid])
+	# db.session.delete(assign)
+	# db.session.commit()
+	# flash('The apatient assignment has been deleted!', 'success')
+	# return redirect(url_for('home'))

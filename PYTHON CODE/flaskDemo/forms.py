@@ -111,54 +111,59 @@ class CheckOutForm(FlaskForm):
 	patientSelection = SelectField("Patients", coerce = int)
 	submit = SubmitField("Check Out Patient")
 	
-class AssignUpdateForm(FlaskForm):
+class DocToPatientForm(FlaskForm):
+	patientSelection = SelectField("Patients", coerce = int)
+	submit = SubmitField("Assign To Patient")
 
-#	 dnumber=IntegerField('Department Number', validators=[DataRequired()])
-	adminid = HiddenField("")
+
+# class AssignUpdateForm(FlaskForm):
+
+# #	 dnumber=IntegerField('Department Number', validators=[DataRequired()])
+	# adminid = HiddenField("")
 	
-	patfname = StringField('Patient\'s First Name:', validators=[DataRequired(),Length(max=15)])
-#  Commented out using a text field, validated with a Regexp.  That also works, but a hassle to enter ssn.
-#	 mgr_ssn = StringField("Manager's SSN", validators=[DataRequired(),Regexp('^(?!000|666)[0-8][0-9]{2}(?!00)[0-9]{2}(?!0000)[0-9]{4}$', message="Please enter 9 digits for a social security.")])
+	# patfname = StringField('Patient\'s First Name:', validators=[DataRequired(),Length(max=15)])
+# #  Commented out using a text field, validated with a Regexp.  That also works, but a hassle to enter ssn.
+# #	 mgr_ssn = StringField("Manager's SSN", validators=[DataRequired(),Regexp('^(?!000|666)[0-8][0-9]{2}(?!00)[0-9]{2}(?!0000)[0-9]{4}$', message="Please enter 9 digits for a social security.")])
 
-	patlname = StringField('Patient\'s Last Name:', validators=[DataRequired(),Length(max=15)])
-#  Commented out using a text field, validated with a Regexp.  That also works, but a hassle to enter ssn.
-#	 mgr_ssn = StringField("Manager's SSN", validators=[DataRequired(),Regexp('^(?!000|666)[0-8][0-9]{2}(?!00)[0-9]{2}(?!0000)[0-9]{4}$', message="Please enter 9 digits for a social security.")])
+	# patlname = StringField('Patient\'s Last Name:', validators=[DataRequired(),Length(max=15)])
+# #  Commented out using a text field, validated with a Regexp.  That also works, but a hassle to enter ssn.
+# #	 mgr_ssn = StringField("Manager's SSN", validators=[DataRequired(),Regexp('^(?!000|666)[0-8][0-9]{2}(?!00)[0-9]{2}(?!0000)[0-9]{4}$', message="Please enter 9 digits for a social security.")])
 
 
-#  One of many ways to use SelectField or QuerySelectField.	 Lots of issues using those fields!!
-	pid = SelectField('Patient ID:',choices=patientChoices, coerce = int)  # empChoices defined at top
+# #  One of many ways to use SelectField or QuerySelectField.	 Lots of issues using those fields!!
+	# pid = SelectField('Patient ID:',choices=patientChoices, coerce = int)  # empChoices defined at top
 	
-	medcondition = StringField('Patient\'s Medical Condition:')
+	# medcondition = StringField('Patient\'s Medical Condition:')
 	
-# Doctor ID
-	docid = SelectField("Doctor ID", choices=doctorChoices, coerce = int)	 
+# # Doctor ID
+	# docid = SelectField("Doctor ID", choices=doctorChoices, coerce = int)	 
 	 
 	
-# the regexp works, and even gives an error message
-#	 mgr_start=DateField("Manager's Start Date:	 yyyy-mm-dd",validators=[Regexp(regex)])
-#	 mgr_start = DateField("Manager's Start Date")
+# # the regexp works, and even gives an error message
+# #	 mgr_start=DateField("Manager's Start Date:	 yyyy-mm-dd",validators=[Regexp(regex)])
+# #	 mgr_start = DateField("Manager's Start Date")
 
-#	 mgr_start=DateField("Manager's Start Date", format='%Y-%m-%d')
-	#hours = DateField('Hours', validators=[DataRequired(),Length(max=30)]) #hours field in works_on  # This is using the html5 date picker (imported)
-	submit = SubmitField('Update this Assignment')
+# #	 mgr_start=DateField("Manager's Start Date", format='%Y-%m-%d')
+	# #hours = DateField('Hours', validators=[DataRequired(),Length(max=30)]) #hours field in works_on  # This is using the html5 date picker (imported)
+	# submit = SubmitField('Update this Assignment')
 
-# got rid of def validate_dnumber
+# # got rid of def validate_dnumber
 	
-	def validate_doc(self, doclname):	 # apparently in the company DB, dname is specified as unique
-		 assign1 = Doctor.query.filter_by(lname=doclname.data).first()
-		 if assign1 and (str(Doctor.id) != str(self.docID.data)):
-			 raise ValidationError('That doctor is already attending someone. Please choose a different doctor.')
+	# def validate_doc(self, doclname):	 # apparently in the company DB, dname is specified as unique
+		 # assign1 = Doctor.query.filter_by(lname=doclname.data).first()
+		 # if assign1 and (str(Doctor.id) != str(self.docID.data)):
+			 # raise ValidationError('That doctor is already attending someone. Please choose a different doctor.')
 				  
-		 #if assign:
-			 #raise ValidationError('That doctor is already attending someone. Please choose a different doctor.')
+		 # #if assign:
+			 # #raise ValidationError('That doctor is already attending someone. Please choose a different doctor.')
 
-class AssignForm(AssignUpdateForm):
+# class AssignForm(AssignUpdateForm):
 
-	pid = IntegerField("Patient ID", validators=[DataRequired()])
-	submit = SubmitField('Add this Patient')
+	# pid = IntegerField("Patient ID", validators=[DataRequired()])
+	# submit = SubmitField('Add this Patient')
 
-	def validate_pid(self, pid):	#because dnumber is primary key and should be unique
-		assign = patient.query.filter_by(id=pid.data).first()
-		if assign:
-			raise ValidationError('That patient has already been assigned. Please choose a different one.')
+	# def validate_pid(self, pid):	#because dnumber is primary key and should be unique
+		# assign = patient.query.filter_by(id=pid.data).first()
+		# if assign:
+			# raise ValidationError('That patient has already been assigned. Please choose a different one.')
 
