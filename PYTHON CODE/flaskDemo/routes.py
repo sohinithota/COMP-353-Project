@@ -29,6 +29,54 @@ def login():
 		except ValueError:
 			flash('Login Unsuccessful. Please check account name and password', 'danger')
 	return render_template('login.html', title='Login', form=form)
+	
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+	form = RegistrationForm()
+	if form.validate_on_submit():
+		try:
+			hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+			user = Accounts(accountName = form.accountname.data, accountPassword = hashed_password, accountType = form.accounttype.data)
+			db.session.add(user)
+			db.session.commit()
+			flash('An account has been created! You are now able to log in to it.', 'success')
+			return redirect(url_for('login'))
+		except IntegrityError:
+			flash('Invalid account information. Try again.')
+			return redirect(url_for('register'))
+	return render_template('register.html', title='Register', form=form)
+	
+@app.route("/account", methods=['GET', 'POST'])
+@login_required
+def account():
+	if current_user.accountType == 0:
+		form = UpdateDoctorAccountForm()
+	else:
+		form = UpdatePatientAdministratorAccountForm()
+	
+	if form.validate_on_submit():
+		if form.picture.data:
+			picture_file = save_picture(form.picture.data)
+			current_user.image_file = picture_file
+		current_user.accountName = form.accountname.data
+		accountID = current_user.id
+		if current_user.accountType == 0:
+			test = db.session.query(Doctor).filter(Doctor.id == form.associatewithemployee.data)
+			test2 = db.session.query(Doctor).filter(Doctor.accountID == accountID)
+			test2.update({Doctor.accountID:None})
+			test.update({Doctor.accountID:accountID})
+		else:
+			test = db.session.query(PatientAdministrator).filter(PatientAdministrator.id == form.associatewithemployee.data)
+			test2 = db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == accountID)
+			test2.update({PatientAdministrator.accountID:None})
+			test.update({PatientAdministrator.accountID:accountID})
+		db.session.commit()
+		flash('Your account has been updated!', 'success')
+		return redirect(url_for('home'))
+	elif request.method == 'GET':
+		form.accountname.data = current_user.accountName
+	image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+	return render_template('account.html', title = 'Account', image_file = image_file, form = form)
 
 @app.route("/home")
 @login_required
@@ -78,22 +126,6 @@ def home():
 def about():
 	return render_template('about.html', title='About')
 
-@app.route("/register", methods=['GET', 'POST'])
-def register():
-	form = RegistrationForm()
-	if form.validate_on_submit():
-		try:
-			hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-			user = Accounts(accountName = form.accountname.data, accountPassword = hashed_password, accountType = form.accounttype.data)
-			db.session.add(user)
-			db.session.commit()
-			flash('An account has been created! You are now able to log in to it.', 'success')
-			return redirect(url_for('register'))
-		except IntegrityError:
-			flash('Invalid account information. Try again.')
-			return redirect(url_for('register'))
-	return render_template('register.html', title='Register', form=form)
-
 @app.route("/logout")
 def logout():
 	logout_user()
@@ -111,41 +143,6 @@ def save_picture(form_picture):
 	i.save(picture_path)
 
 	return picture_fn
-
-@app.route("/account", methods=['GET', 'POST'])
-@login_required
-def account():
-	if current_user.accountType == 0:
-		form = UpdateDoctorAccountForm()
-	else:
-		form = UpdatePatientAdministratorAccountForm()
-	
-	if form.validate_on_submit():
-		if form.picture.data:
-			picture_file = save_picture(form.picture.data)
-			current_user.image_file = picture_file
-		hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-		current_user.accountName = form.accountname.data
-		current_user.accountPassword = hashed_password
-		
-		accountID = current_user.id
-		if current_user.accountType == 0:
-			test = db.session.query(Doctor).filter(Doctor.id == form.associatewithemployee.data)
-			test2 = db.session.query(Doctor).filter(Doctor.accountID == accountID)
-			test2.update({Doctor.accountID:None})
-			test.update({Doctor.accountID:accountID})
-		else:
-			test = db.session.query(PatientAdministrator).filter(PatientAdministrator.id == form.associatewithemployee.data)
-			test2 = db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == accountID)
-			test2.update({PatientAdministrator.accountID:None})
-			test.update({PatientAdministrator.accountID:accountID})
-		db.session.commit()
-		flash('Your account has been updated!', 'success')
-		return redirect(url_for('home'))
-	elif request.method == 'GET':
-		form.accountname.data = current_user.accountName
-	image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
-	return render_template('account.html', title = 'Account', image_file = image_file, form = form)
 
 @app.route("/checkin", methods = ['GET', 'POST'])
 @login_required

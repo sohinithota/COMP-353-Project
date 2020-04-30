@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from flaskDemo import db
 from flaskDemo.models import Accounts, Bed, Doctor, MedicalDevices, Patient, PatientAdministrator
-from flaskDemo.models import getDoctor, getPatientAdministrator
+from flaskDemo.models import getDoctor, getPatientAdministrator, getPatient
 from wtforms.fields.html5 import DateField
 
 pid = Patient.query.with_entities(Patient.id)
@@ -14,6 +14,7 @@ docid = Doctor.query.with_entities(Doctor.id)
 
 listPatientAdministrators = []
 listDoctors = []
+listAvailiblePatients = []
 
 for x in getPatientAdministrator():
 	id = x.id
@@ -29,6 +30,16 @@ for x in getDoctor():
 	name = fname + " " + lname
 	listDoctors.append((id, name))
 
+for x in getPatient():
+	if x.departTime:
+		pass
+	else:
+		id = x.id
+		fname = x.fname
+		lname = x.lname
+		name = fname + " " + lname
+		listAvailiblePatients.append((id, name))
+	
 #  or could have used ssns = db.session.query(Department.mgr_ssn).distinct()
 # for that way, we would have imported db from flaskDemo, see above
 
@@ -66,8 +77,6 @@ class LoginForm(FlaskForm):
 
 class UpdateDoctorAccountForm(FlaskForm):
 	accountname = StringField('Account Name',validators=[DataRequired(), Length(min=2, max=20)])
-	password = PasswordField('Password', validators=[DataRequired()])
-	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
 	picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
 	associatewithemployee = SelectField("Availible Employees", choices = listDoctors, coerce = int)
 	submit = SubmitField('Update')
@@ -80,8 +89,6 @@ class UpdateDoctorAccountForm(FlaskForm):
 
 class UpdatePatientAdministratorAccountForm(FlaskForm):
 	accountname = StringField('Account Name',validators=[DataRequired(), Length(min=2, max=20)])
-	password = PasswordField('Password', validators=[DataRequired()])
-	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
 	picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
 	associatewithemployee = SelectField("Availible Employees", choices = listPatientAdministrators, coerce = int)
 	submit = SubmitField('Update')
@@ -107,6 +114,10 @@ class CheckInForm(FlaskForm):
 	sex = StringField("Sex", validators = [DataRequired(), Length(min=1, max=1)])
 	medicalCondition = StringField("Medical Condition", validators = [DataRequired()])
 	submit = SubmitField('Check In Patient')
+	
+class CheckOutForm(FlaskForm):
+	patientSelection = SelectField("Patients", choices = listAvailiblePatients, coerce = int)
+	submit = SubmitField("Check Out Patient")
 	
 class AssignUpdateForm(FlaskForm):
 
