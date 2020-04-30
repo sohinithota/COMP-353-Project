@@ -16,7 +16,7 @@ login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 
 from flaskDemo import routes
-from flaskDemo import models
+from flaskDemo import models 
 
 models.db.create_all()
 
@@ -35,13 +35,12 @@ else:
 		for x in models.getPatient():
 			pID.append(x.id)
 
-		max = 9
+		max = db.session.query(models.PatientAdministrator).count()
 		for x in pID:
 			if max == 0:
 				assignedPAID = paID[0]
 			else:
-				assignedPAID = paID.pop(randint(0,max))
-				max = max - 1
+				assignedPAID = paID[randint(0,max - 1)]
 			test = db.session.query(models.Patient).filter(models.Patient.id == x)
 			test.update({models.Patient.patientadministratorID:assignedPAID})
 		db.session.commit()

@@ -5,13 +5,23 @@ from flask import render_template, url_for, flash, redirect, request, abort
 from flaskDemo import app, db, bcrypt
 from flaskDemo.forms import RegistrationForm, LoginForm, UpdateDoctorAccountForm, UpdatePatientAdministratorAccountForm, PostForm, AssignForm, AssignUpdateForm, CheckInForm, CheckOutForm
 from flaskDemo.models import Accounts, Bed, Doctor, MedicalDevices, Patient, PatientAdministrator
-from flaskDemo.models import getDoctor, getPatientAdministrator
+from flaskDemo.models import getDoctor, getPatientAdministrator, getPatient
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import UnmappedInstanceError
+from wtforms import SelectField
+import traceback
 
 
 @app.route("/")
+def root():
+	return redirect(url_for('home'))
+
+@app.route("/about")
+def about():
+	return render_template('about.html', title='About')
+	
 @app.route("/login", methods=['GET', 'POST'])
 def login():
 	if current_user.is_authenticated:
@@ -87,27 +97,23 @@ def home():
 			currentPatientAdmin = db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == current_user.id).first()
 			assignedPatients = db.session.query(Patient).filter(Patient.patientadministratorID == currentPatientAdmin.id).all()
 			for x in assignedPatients:
-				if (x.departTime is None):
-					if (x.minit is None) or (x.minit == ""):
-						name = x.fname + " " + x.lname
-					else:
-						name = x.fname + " " + x.minit + " " + x.lname
-					data.append({"name":name, "id":x.id, "ssn":x.ssn, "arrivalTime":x.arrivalTime, "address":x.address, "medicalCondition":x.medicalCondition, "inBed":x.inBed, "bedID":x.bedID, "doctorID":x.doctorID})
+				if (x.minit is None) or (x.minit == ""):
+					name = x.fname + " " + x.lname
 				else:
-					pass
+					name = x.fname + " " + x.minit + " " + x.lname
+				data.append({"name":name, "id":x.id, "ssn":x.ssn, "arrivalTime":x.arrivalTime, "address":x.address, "medicalCondition":x.medicalCondition, "inBed":x.inBed, "bedID":x.bedID, "doctorID":x.doctorID})
 		else:
 			currentDoctor = db.session.query(Doctor).filter(Doctor.accountID == current_user.id).first()
 			assignedPatients = db.session.query(Patient).filter(Patient.doctorID == currentDoctor.id).all()
 			for x in assignedPatients:
-				if (x.departTime is None):
-					if (x.minit is None) or (x.minit == ""):
-						name = x.fname + " " + x.lname
-					else:
-						name = x.fname + " " + x.minit + " " + x.lname
-					data.append({"name":name, "id":x.id, "ssn":x.ssn, "arrivalTime":x.arrivalTime, "sex":x.sex, "medicalCondition":x.medicalCondition, "inBed":x.inBed, "bedID":x.bedID, "patientadministratorID":x.doctorID})
+				if (x.minit is None) or (x.minit == ""):
+					name = x.fname + " " + x.lname
 				else:
-					pass
-	except AttributeError:
+					name = x.fname + " " + x.minit + " " + x.lname
+				data.append({"name":name, "id":x.id, "ssn":x.ssn, "arrivalTime":x.arrivalTime, "sex":x.sex, "medicalCondition":x.medicalCondition, "inBed":x.inBed, "bedID":x.bedID, "patientadministratorID":x.doctorID})
+	except AttributeError as error:
+		print(traceback.format_exc())
+		print(error)
 		return redirect(url_for('account'))
 	return render_template('assign_home.html', patientInformation = data)
 	
@@ -121,10 +127,6 @@ def home():
 	results2 = Patient.query.join(assignment,Patient.patientID == assignment.patientID).add_columns(Patient.fname, Patient.lname, Patient.ssn, assignment.adminID).join(doctor, doctor.docID == assignment.docID).add_columns(doctor.docfname,doctor.doclname)
 	results = Patient.query.join(assignment,Patient.patientID == assignment.patientID).add_columns(Patient.fname, Patient.lname, Patient.ssn, assignment.adminID)
 	return render_template('home.html', title='Join', joined_1_n = results, joined_m_n = results2, currentUser = current_user)
-
-@app.route("/about")
-def about():
-	return render_template('about.html', title='About')
 
 @app.route("/logout")
 def logout():
@@ -152,12 +154,17 @@ def checkin():
 	
 	form = CheckInForm()
 	if form.is_submitted():
-		patient = None
 		try:
-			patient = Patient(fname=form.firstName.data, minit=form.middleInit.data, lname=form.lastName.data, ssn=int(form.ssn.data), bdate=form.birthdate.data, address=form.address.data, sex=form.sex.data, arrivalTime=datetime.now(), departTime = None, medicalCondition = form.medicalCondition.data, patientadministratorID = db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == current_user.id).first().id)
-		except ValueError:
-			redirect(url_for('checkin'))
-		db.session.add(patient)
+			print
+			patient = Patient(fname=form.firstName.data, minit=form.middleInit.data, lname=form.lastName.data, ssn=int(form.ssn.data), bdate=form.birthdate.data, address=form.address.data, sex=form.sex.data, arrivalTime=datetime.now(), medicalCondition=form.medicalCondition.data, patientadministratorID=db.session.query(PatientAdministrator).filter(PatientAdministrator.accountID == current_user.id).first().id)
+			db.session.add(patient)
+		except ValueError as error:
+			print(error)
+			flash('Invalid patient information. ValueError', 'success')
+			return redirect(url_for('checkin'))
+		except UnmappedInstanceError:
+			flash('Invalid patient information. UnMappedInstanceErrror', 'success')
+			return redirect(url_for('checkin'))
 		db.session.commit()
 		return redirect(url_for('home'))
 	return render_template('checkin.html', title = 'Check In Patient', form = form)
@@ -168,7 +175,29 @@ def checkout():
 	if current_user.accountType != 1:
 		return redirect(url_for('home'))
 	
+	listAvailiblePatients = []
+	currentPAID = None
+	
+	for x in getPatientAdministrator():
+		if x.accountID == current_user.id:
+			currentPAID = x.id
+	
+	for x in getPatient():
+		print(x.patientadministratorID)
+		if x.patientadministratorID == currentPAID:
+			name = None
+			id = x.id
+			fname = x.fname
+			lname = x.lname
+			minit = x.minit
+			if minit is None:
+				name = fname + " " + lname
+			else:
+				name = fname + " " + minit + " " + lname
+			listAvailiblePatients.append((id, name))
+		
 	form = CheckOutForm()
+	form.patientSelection.choices = listAvailiblePatients
 	if form.is_submitted():
 		patient = db.session.query(Patient).filter(Patient.id == form.patientSelection.data).first()
 		db.session.delete(patient)

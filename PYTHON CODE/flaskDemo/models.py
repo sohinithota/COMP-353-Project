@@ -6,6 +6,8 @@ from flask_login import UserMixin
 from functools import partial
 from sqlalchemy import orm
 
+current_user = None
+
 db.Model.metadata.reflect(db.engine)
 
 class Accounts(db.Model, UserMixin):
@@ -67,7 +69,7 @@ def getDoctor(columns=None):
 	
 def getDoctorFactory(columns=None):
 	return partial(getDoctor, columns=columns)	  
-	
+
 # class assignment(db.Model):
 	# __table__ = db.Model.metadata.tables['assignment']
 	

@@ -30,7 +30,7 @@ CREATE TABLE medicaldevices(
 );
 
 CREATE TABLE patient(
-    id INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     fname VARCHAR(60) NOT NULL,
     minit VARCHAR(60),
     lname VARCHAR(60) NOT NULL,
@@ -39,7 +39,6 @@ CREATE TABLE patient(
     address VARCHAR(60),
     sex VARCHAR(60),
     arrivalTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    departTime TIMESTAMP NULL,
     medicalCondition VARCHAR(60) NOT NULL,
     inBed BOOLEAN NOT NULL DEFAULT FALSE,
     bedID INT,

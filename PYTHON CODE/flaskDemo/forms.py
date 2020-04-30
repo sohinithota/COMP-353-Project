@@ -14,7 +14,6 @@ docid = Doctor.query.with_entities(Doctor.id)
 
 
 listDoctors = []
-listAvailiblePatients = []
 
 for x in getDoctor():
 	id = x.id
@@ -23,15 +22,6 @@ for x in getDoctor():
 	name = fname + " " + lname
 	listDoctors.append((id, name))
 
-for x in getPatient():
-	if x.departTime:
-		pass
-	else:
-		id = x.id
-		fname = x.fname
-		lname = x.lname
-		name = fname + " " + lname
-		listAvailiblePatients.append((id, name))
 	
 #  or could have used ssns = db.session.query(Department.mgr_ssn).distinct()
 # for that way, we would have imported db from flaskDemo, see above
@@ -118,7 +108,7 @@ class CheckInForm(FlaskForm):
 	submit = SubmitField('Check In Patient')
 	
 class CheckOutForm(FlaskForm):
-	patientSelection = SelectField("Patients", choices = listAvailiblePatients, coerce = int)
+	patientSelection = SelectField("Patients", coerce = int)
 	submit = SubmitField("Check Out Patient")
 	
 class AssignUpdateForm(FlaskForm):
